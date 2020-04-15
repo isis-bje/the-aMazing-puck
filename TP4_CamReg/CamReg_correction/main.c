@@ -15,6 +15,8 @@
 #include <pi_regulator.h>
 #include <process_image.h>
 
+#include <sensors/proximity.h>
+
 void SendUint8ToComputer(uint8_t* data, uint16_t size) 
 {
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);
@@ -22,6 +24,13 @@ void SendUint8ToComputer(uint8_t* data, uint16_t size)
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
 }
 
+
+//declaration necessaire pour faire fonctionner le capteur de distance
+messagebus_t bus;
+MUTEX_DECL(bus_lock);
+CONDVAR_DECL(bus_condvar);
+
+//NE PAS RETIRER
 static void serial_start(void)
 {
 	static SerialConfig ser_cfg = {
@@ -41,10 +50,15 @@ int main(void)
     chSysInit();
     mpu_init();
 
+    //NE PAS RETIRER
+    messagebus_init(&bus, &bus_lock, &bus_condvar);
+
     //starts the serial communication
     serial_start();
     //start the USB communication
     usb_start();
+    //starts the proximity sensors
+    proximity_start();
     //starts the camera
     dcmi_start();
 	po8030_start();
@@ -62,6 +76,7 @@ int main(void)
     }
 }
 
+// NE PAS RETIRER 
 #define STACK_CHK_GUARD 0xe2dee396
 uintptr_t __stack_chk_guard = STACK_CHK_GUARD;
 
