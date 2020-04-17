@@ -19,5 +19,4 @@
 void measureDists(int32_t dists[]);
 
 
-
 #endif /* CAPTEUR_DISTANCE_TEST_H_ */

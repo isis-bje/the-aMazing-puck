@@ -18,12 +18,12 @@
 #include <sensors/proximity.h>
 #include <capteur_distance_test.h>
 
-void SendUint8ToComputer(uint8_t* data, uint16_t size) 
+/* void SendUint8ToComputer(uint8_t* data, uint16_t size)
 {
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)&size, sizeof(uint16_t));
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
-}
+}*/
 
 
 //declaration necessaire pour faire fonctionner le capteur de distance
@@ -56,36 +56,40 @@ int main(void)
 
     //starts the serial communication
     serial_start();
+
     //start the USB communication
     usb_start();
+
     //starts the proximity sensors
     proximity_start();
+    calibrate_ir();
+
+
     //starts the camera
-    dcmi_start();
-	po8030_start();
-	//inits the motors
+    //dcmi_start();
+	//po8030_start();
+
+    //inits the motors
 	motors_init();
 
 	//stars the threads for the pi regulator and the processing of the image
-	pi_regulator_start();
-	process_image_start();
+	//pi_regulator_start();
+	//process_image_start();
 
 	int32_t mur_proche[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-
-
     /* Infinite loop. */
-    while (1) {
+    while (1){
 
-    	//détection des murs à proximité, remplissage tableau (pas de boucle "for" car les capteurs ne sont pas tous utilisés -> 0,1,2,5,6,7
+    	 //détection des murs à proximité, remplissage tableau (pas de boucle "for" car les capteurs ne sont pas tous utilisés -> 0,1,2,5,6,7
     	measureDists(mur_proche);
-    	chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \n", mur_proche[FRONT_LEFT]);
-    	chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \n", mur_proche[FRONT_RIGHT]);
-		chprintf((BaseSequentialStream *) &SD3, "Capteur front side left: %d \n", mur_proche[FRONT_SIDE_LEFT]);
+    	//chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \n", mur_proche[FRONT_LEFT]);
+    	//chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \n", mur_proche[FRONT_RIGHT]);
+		//chprintf((BaseSequentialStream *) &SD3, "Capteur front side left: %d \n", mur_proche[FRONT_SIDE_LEFT]);
 		chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \n", mur_proche[FRONT_SIDE_RIGHT]);
-		chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \n", mur_proche[SIDE_LEFT]);
-		chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", mur_proche[SIDE_RIGHT]);
-    	//waits 1 second
+		//chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \n", mur_proche[SIDE_LEFT]);
+		//chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", mur_proche[SIDE_RIGHT]);
+    	 //waits 1 second
         chThdSleepMilliseconds(1000);
     }
 }
