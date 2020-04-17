@@ -16,6 +16,7 @@
 #include <process_image.h>
 
 #include <sensors/proximity.h>
+#include <capteur_distance_test.h>
 
 void SendUint8ToComputer(uint8_t* data, uint16_t size) 
 {
@@ -69,8 +70,21 @@ int main(void)
 	pi_regulator_start();
 	process_image_start();
 
+	int32_t mur_proche[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+
+
     /* Infinite loop. */
     while (1) {
+
+    	//détection des murs à proximité, remplissage tableau (pas de boucle "for" car les capteurs ne sont pas tous utilisés -> 0,1,2,5,6,7
+    	measureDists(mur_proche);
+    	chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \n", mur_proche[FRONT_LEFT]);
+    	chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \n", mur_proche[FRONT_RIGHT]);
+		chprintf((BaseSequentialStream *) &SD3, "Capteur front side left: %d \n", mur_proche[FRONT_SIDE_LEFT]);
+		chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \n", mur_proche[FRONT_SIDE_RIGHT]);
+		chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \n", mur_proche[SIDE_LEFT]);
+		chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", mur_proche[SIDE_RIGHT]);
     	//waits 1 second
         chThdSleepMilliseconds(1000);
     }
