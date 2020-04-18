@@ -24,6 +24,8 @@ extern "C" {
 #define KI 						3.5f	//must not be zero
 #define MAX_SUM_ERROR 			(MOTOR_SPEED_LIMIT/KI)
 
+#define DISTANCE_PASSAGE		200 //? valeur de seuil pour détecter une ouverture, à modifier expérimentalement
+
 
 
 

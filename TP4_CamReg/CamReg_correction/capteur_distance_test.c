@@ -21,3 +21,13 @@ void measureDists(int32_t dists[NB_CAPTEURS])
 	dists[SIDE_RIGHT] = get_calibrated_prox(SIDE_RIGHT);
 	dists[SIDE_LEFT] = get_calibrated_prox(SIDE_LEFT);
 }
+
+void findPath(int32_t path[NB_CAPTEURS])
+{
+	path[FRONT_RIGHT] = get_prox(FRONT_RIGHT);
+	path[FRONT_LEFT] = get_prox(FRONT_LEFT);
+	path[FRONT_SIDE_RIGHT] = get_prox(FRONT_SIDE_RIGHT);
+	path[FRONT_SIDE_LEFT] = get_prox(FRONT_SIDE_LEFT);
+	path[SIDE_RIGHT] = get_prox(SIDE_RIGHT);
+	path[SIDE_LEFT] = get_prox(SIDE_LEFT);
+}

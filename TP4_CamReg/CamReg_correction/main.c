@@ -76,19 +76,60 @@ int main(void)
 	//pi_regulator_start();
 	//process_image_start();
 
-	int32_t mur_proche[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
+	int32_t wall_close[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
+	int32_t path[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     /* Infinite loop. */
     while (1){
 
     	 //détection des murs à proximité, remplissage tableau (pas de boucle "for" car les capteurs ne sont pas tous utilisés -> 0,1,2,5,6,7
-    	measureDists(mur_proche);
-    	//chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \n", mur_proche[FRONT_LEFT]);
-    	//chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \n", mur_proche[FRONT_RIGHT]);
-		//chprintf((BaseSequentialStream *) &SD3, "Capteur front side left: %d \n", mur_proche[FRONT_SIDE_LEFT]);
-		chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \n", mur_proche[FRONT_SIDE_RIGHT]);
-		//chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \n", mur_proche[SIDE_LEFT]);
-		//chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", mur_proche[SIDE_RIGHT]);
+    	measureDists(wall_close);
+    	//chprintf((BaseSequentialStream *) &SD3, "Capteur front left calibrated: %d \n", wall_close[FRONT_LEFT]);
+    	//chprintf((BaseSequentialStream *) &SD3, "Capteur front right calibrated: %d \n", wall_close[FRONT_RIGHT]);
+		//chprintf((BaseSequentialStream *) &SD3, "Capteur front side left calibrated: %d \n", wall_close[FRONT_SIDE_LEFT]);
+		chprintf((BaseSequentialStream *) &SD3, "Capteur front side right calibrated: %d \n", wall_close[FRONT_SIDE_RIGHT]);
+		//chprintf((BaseSequentialStream *) &SD3, "Capteur side left calibrated: %d \n", wall_close[SIDE_LEFT]);
+		//chprintf((BaseSequentialStream *) &SD3, "Capteur side right calibrated: %d \n", wall_close[SIDE_RIGHT]);
+
+		//détection des ouvertures à proximité, remplissage tableau, algorithme choix du chemin
+		findPath(path);
+	 	//chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \n", path[FRONT_LEFT]);
+	    //chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \n", path[FRONT_RIGHT]);
+		//chprintf((BaseSequentialStream *) &SD3, "Capteur front side left: %d \n", path[FRONT_SIDE_LEFT]);
+		chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \n", path[FRONT_SIDE_RIGHT]);
+		//chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \n", path[SIDE_LEFT]);
+		//chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", path[SIDE_RIGHT]);
+
+
+		//algorithme de résolution du labyrinthe,
+		//détection bancale des passage (si mur s'éloigne et assez éloigné, détection du passage) -> probablement à améliorer
+		//à vérifier: tourner au bon moment, ne pas activer le demi-tour par erreur, détection correcte des passages, etc...
+		//si passage à droite, y aller
+		if(path[SIDE_RIGHT] > get_prox(SIDE_RIGHT) && get_prox(SIDE_RIGHT) < DISTANCE_PASSAGE)
+		{
+			chprintf((BaseSequentialStream *) &SD3, "passage à droite détecté");
+			//fonctions pour faire tourner le robot à droite
+		}
+		//si pas de passage à droite, aller tout droit
+		else if(path[FRONT_LEFT] > get_prox(FRONT_LEFT) && path[FRONT_RIGHT] > get_prox(FRONT_RIGHT))
+		{
+			chprintf((BaseSequentialStream *) &SD3, "passage devant détecté");
+			//fonctions pour faire avancer le robot tout droit
+		}
+		//si passage ni à droite, ni tout droit, mais à gauche, aller à gauche
+		else if(path[SIDE_LEFT] > get_prox(SIDE_LEFT) && get_prox(SIDE_LEFT) < DISTANCE_PASSAGE)
+		{
+			chprintf((BaseSequentialStream *) &SD3, "passage à gauche détecté");
+			//fonctions pour faire tourner le robot à gauche
+		}
+		//si aucun passage n'existe, faire demi-tour
+		else
+		{
+			chprintf((BaseSequentialStream *) &SD3, "aucun passage détecté, demi-tour");
+			//fonctions pour faire un demi-tour
+		}
+
+
     	 //waits 1 second
         chThdSleepMilliseconds(1000);
     }

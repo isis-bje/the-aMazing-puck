@@ -17,6 +17,7 @@
 #define SIDE_LEFT					5
 
 void measureDists(int32_t dists[]);
+void findPath(int32_t path[]);
 
 
 #endif /* CAPTEUR_DISTANCE_TEST_H_ */
