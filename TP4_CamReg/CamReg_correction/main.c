@@ -18,6 +18,14 @@
 #include <sensors/proximity.h>
 #include <capteur_distance_test.h>
 
+#define CROSSROAD			1
+#define T_JUNCTION_LEFT		2
+#define T_JUNCTION_RIGHT	3
+#define T_JUNCTION			4
+#define STRAIGHT_PATH		5
+#define CORNER_LEFT			6
+#define CORNER_RIGHT		7
+#define CUL_DE_SAC			8
 /* void SendUint8ToComputer(uint8_t* data, uint16_t size)
 {
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);
@@ -78,6 +86,7 @@ int main(void)
 
 	int32_t wall_close[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
 	int32_t path[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
+	int node_type = 0;
 
     /* Infinite loop. */
     while (1){
@@ -101,7 +110,7 @@ int main(void)
 		//chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", path[SIDE_RIGHT]);
 
 
-		//algorithme de résolution du labyrinthe,
+		/*//algorithme de résolution du labyrinthe,
 		//détection bancale des passage (si mur s'éloigne et assez éloigné, détection du passage) -> probablement à améliorer
 		//à vérifier: tourner au bon moment, ne pas activer le demi-tour par erreur, détection correcte des passages, etc...
 		//si passage à droite, y aller
@@ -127,8 +136,49 @@ int main(void)
 		{
 			chprintf((BaseSequentialStream *) &SD3, "aucun passage détecté, demi-tour");
 			//fonctions pour faire un demi-tour
-		}
+		} */
 
+		//algorithme de détection du type de jonction
+		if(path[FRONT_LEFT] < DISTANCE_PASSAGE && path[FRONT_RIGHT] < DISTANCE_PASSAGE) //si passage devant ouvert
+		{
+			if(path[SIDE_LEFT] < DISTANCE_PASSAGE && path[SIDE_RIGHT] < DISTANCE_PASSAGE) //si passage à gauche et à droite
+			{
+				node_type = CROSSROAD;
+
+			}
+			else if(path[SIDE_LEFT] < DISTANCE_PASSAGE) //si passage à gauche
+			{
+				node_type = T_JUNCTION_LEFT;
+			}
+			else if(path[SIDE_RIGHT] < DISTANCE_PASSAGE) //si passage à droite
+			{
+				node_type = T_JUNCTION_RIGHT;
+			}
+			else //passage uniquement tout droit
+			{
+				node_type = STRAIGHT_PATH;
+			}
+		}
+		else //si pas de passage devant
+		{
+			if(path[SIDE_LEFT] < DISTANCE_PASSAGE && path[SIDE_RIGHT] < DISTANCE_PASSAGE) //si passage à gauche et à droite
+			{
+				node_type = T_JUNCTION;
+			}
+			else if(path[SIDE_LEFT] < DISTANCE_PASSAGE) //si passage à gauche
+			{
+				node_type = CORNER_LEFT;
+			}
+			else if(path[SIDE_RIGHT] < DISTANCE_PASSAGE) //si passage à droite
+			{
+				node_type = CORNER_RIGHT;
+			}
+			else //aucun passage
+			{
+				node_type = CUL_DE_SAC;
+			}
+		}
+		chprintf((BaseSequentialStream *) &SD3, "%d", node_type);
 
     	 //waits 1 second
         chThdSleepMilliseconds(1000);

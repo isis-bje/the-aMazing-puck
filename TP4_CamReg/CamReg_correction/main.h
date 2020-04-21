@@ -29,6 +29,7 @@ extern "C" {
 
 
 
+
 /** Robot wide IPC bus. */
 extern messagebus_t bus;
 
