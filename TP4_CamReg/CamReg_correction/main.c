@@ -1,3 +1,5 @@
+// From the ePuck library
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,35 +8,18 @@
 #include "ch.h"
 #include "hal.h"
 #include "memory_protection.h"
+
 #include <usbcfg.h>
-#include <main.h>
-#include <motors.h>
-#include <camera/po8030.h>
 #include <chprintf.h>
-
-#include <pi_regulator.h>
-#include <process_image.h>
-
+#include <motors.h>
 #include <sensors/proximity.h>
-#include <capteur_distance_test.h>
 
-#define CROSSROAD			1
-#define T_JUNCTION_LEFT		2
-#define T_JUNCTION_RIGHT	3
-#define T_JUNCTION			4
-#define STRAIGHT_PATH		5
-#define CORNER_LEFT			6
-#define CORNER_RIGHT		7
-#define CUL_DE_SAC			8
-/* void SendUint8ToComputer(uint8_t* data, uint16_t size)
-{
-	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);
-	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)&size, sizeof(uint16_t));
-	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
-}*/
+// Our files
 
+#include <main.h>
+#include <move.h>
 
-//declaration necessaire pour faire fonctionner le capteur de distance
+//declaration necessaire pour faire fonctionner le capteur de distance ?
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
 CONDVAR_DECL(bus_condvar);
@@ -49,12 +34,11 @@ static void serial_start(void)
 	    0,
 	};
 
-	sdStart(&SD3, &ser_cfg); // UART3.
+	sdStart(&SD3, &ser_cfg); //UART3.
 }
 
 int main(void)
 {
-
     halInit();
     chSysInit();
     mpu_init();
@@ -72,115 +56,15 @@ int main(void)
     proximity_start();
     calibrate_ir();
 
-
-    //starts the camera
-    //dcmi_start();
-	//po8030_start();
-
-    //inits the motors
+    //initialize the motors
 	motors_init();
-
-	//stars the threads for the pi regulator and the processing of the image
-	//pi_regulator_start();
-	//process_image_start();
-
-	int32_t wall_close[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
-	int32_t path[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
-	int node_type = 0;
+	//starts the threads that controls the movement of the robot
+	move_start();
 
     /* Infinite loop. */
     while (1){
 
-    	 //détection des murs à proximité, remplissage tableau (pas de boucle "for" car les capteurs ne sont pas tous utilisés -> 0,1,2,5,6,7
-    	measureDists(wall_close);
-    	//chprintf((BaseSequentialStream *) &SD3, "Capteur front left calibrated: %d \n", wall_close[FRONT_LEFT]);
-    	//chprintf((BaseSequentialStream *) &SD3, "Capteur front right calibrated: %d \n", wall_close[FRONT_RIGHT]);
-		//chprintf((BaseSequentialStream *) &SD3, "Capteur front side left calibrated: %d \n", wall_close[FRONT_SIDE_LEFT]);
-		chprintf((BaseSequentialStream *) &SD3, "Capteur front side right calibrated: %d \n", wall_close[FRONT_SIDE_RIGHT]);
-		//chprintf((BaseSequentialStream *) &SD3, "Capteur side left calibrated: %d \n", wall_close[SIDE_LEFT]);
-		//chprintf((BaseSequentialStream *) &SD3, "Capteur side right calibrated: %d \n", wall_close[SIDE_RIGHT]);
-
-		//détection des ouvertures à proximité, remplissage tableau, algorithme choix du chemin
-		findPath(path);
-	 	//chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \n", path[FRONT_LEFT]);
-	    //chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \n", path[FRONT_RIGHT]);
-		//chprintf((BaseSequentialStream *) &SD3, "Capteur front side left: %d \n", path[FRONT_SIDE_LEFT]);
-		chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \n", path[FRONT_SIDE_RIGHT]);
-		//chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \n", path[SIDE_LEFT]);
-		//chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", path[SIDE_RIGHT]);
-
-
-		/*//algorithme de résolution du labyrinthe,
-		//détection bancale des passage (si mur s'éloigne et assez éloigné, détection du passage) -> probablement à améliorer
-		//à vérifier: tourner au bon moment, ne pas activer le demi-tour par erreur, détection correcte des passages, etc...
-		//si passage à droite, y aller
-		if(path[SIDE_RIGHT] > get_prox(SIDE_RIGHT) && get_prox(SIDE_RIGHT) < DISTANCE_PASSAGE)
-		{
-			chprintf((BaseSequentialStream *) &SD3, "passage à droite détecté");
-			//fonctions pour faire tourner le robot à droite
-		}
-		//si pas de passage à droite, aller tout droit
-		else if(path[FRONT_LEFT] > get_prox(FRONT_LEFT) && path[FRONT_RIGHT] > get_prox(FRONT_RIGHT))
-		{
-			chprintf((BaseSequentialStream *) &SD3, "passage devant détecté");
-			//fonctions pour faire avancer le robot tout droit
-		}
-		//si passage ni à droite, ni tout droit, mais à gauche, aller à gauche
-		else if(path[SIDE_LEFT] > get_prox(SIDE_LEFT) && get_prox(SIDE_LEFT) < DISTANCE_PASSAGE)
-		{
-			chprintf((BaseSequentialStream *) &SD3, "passage à gauche détecté");
-			//fonctions pour faire tourner le robot à gauche
-		}
-		//si aucun passage n'existe, faire demi-tour
-		else
-		{
-			chprintf((BaseSequentialStream *) &SD3, "aucun passage détecté, demi-tour");
-			//fonctions pour faire un demi-tour
-		} */
-
-		//algorithme de détection du type de jonction
-		if(path[FRONT_LEFT] < DISTANCE_PASSAGE && path[FRONT_RIGHT] < DISTANCE_PASSAGE) //si passage devant ouvert
-		{
-			if(path[SIDE_LEFT] < DISTANCE_PASSAGE && path[SIDE_RIGHT] < DISTANCE_PASSAGE) //si passage à gauche et à droite
-			{
-				node_type = CROSSROAD;
-
-			}
-			else if(path[SIDE_LEFT] < DISTANCE_PASSAGE) //si passage à gauche
-			{
-				node_type = T_JUNCTION_LEFT;
-			}
-			else if(path[SIDE_RIGHT] < DISTANCE_PASSAGE) //si passage à droite
-			{
-				node_type = T_JUNCTION_RIGHT;
-			}
-			else //passage uniquement tout droit
-			{
-				node_type = STRAIGHT_PATH;
-			}
-		}
-		else //si pas de passage devant
-		{
-			if(path[SIDE_LEFT] < DISTANCE_PASSAGE && path[SIDE_RIGHT] < DISTANCE_PASSAGE) //si passage à gauche et à droite
-			{
-				node_type = T_JUNCTION;
-			}
-			else if(path[SIDE_LEFT] < DISTANCE_PASSAGE) //si passage à gauche
-			{
-				node_type = CORNER_LEFT;
-			}
-			else if(path[SIDE_RIGHT] < DISTANCE_PASSAGE) //si passage à droite
-			{
-				node_type = CORNER_RIGHT;
-			}
-			else //aucun passage
-			{
-				node_type = CUL_DE_SAC;
-			}
-		}
-		chprintf((BaseSequentialStream *) &SD3, "%d", node_type);
-
-    	 //waits 1 second
+		//waits 1 second
         chThdSleepMilliseconds(1000);
     }
 }
