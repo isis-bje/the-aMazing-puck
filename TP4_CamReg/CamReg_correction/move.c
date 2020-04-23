@@ -6,7 +6,7 @@
 #include <usbcfg.h>
 #include <sensors/proximity.h>
 
-int junction_detection(int32_t find_path);
+int junction_detection(int32_t find_path[NB_CAPTEURS], uint8_t node_type);
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]);
 void measure_dist(int32_t dist[NB_CAPTEURS]);
 
@@ -20,7 +20,7 @@ static THD_FUNCTION(ThdMove, arg)
 	int32_t path[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	while(1){
-		junction_detection(path);
+		junction_detection(path, node_type);
 	}
 
 	chThdSleepMilliseconds(SLEEP_TIME);
@@ -53,7 +53,7 @@ void move_start(void){
 
 
 //algorithme de détection du type de jonction
-int junction_detection(int32_t find_path){
+int junction_detection(int32_t find_path[], uint8_t node_type){
 
 	measure_dist(find_path);
 

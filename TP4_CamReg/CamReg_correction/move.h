@@ -20,7 +20,7 @@ enum nodes{NODE_ERROR, CROSSROAD, T_JUNCTION_LEFT, T_JUNCTION_RIGHT, T_JUNCTION,
 #define SIDE_LEFT					5 //IR5
 
 #define THRESHOLD_WALL		      200 //? valeur de seuil pour détecter une ouverture, à modifier expérimentalement
-#define SLEEP_TIME
+#define SLEEP_TIME				 1000
 
 void move_start(void);
 
