@@ -36,7 +36,8 @@ static void serial_start(void){
 
 int main(void){
 
-	//static uint8_t mode;
+	static uint8_t mode;
+	static uint8_t pause;
 
 	halInit();
     chSysInit();
@@ -54,24 +55,46 @@ int main(void){
     proximity_start();
     calibrate_ir();
 
+    //start the microphone
+
     //initialize the motors
 	motors_init();
 
-	//LAUNCH MODE : SELECTOR IN 0 -> AUTOMATIC MODE
-	//				SELECTOR IN 1 -> SEMI-AUTOMATIC MODE
-	//AFTER LAUNCHING -> SELECTOR IS USED TO PAUSE OR UNPAUSE (to be done)
-
 	//starts the threads that controls the movement of the robot
-	move_start(); //doit recuperer le mode
+	move_start();
+
+	//LAUNCH MODE : SOUTH -> AUTOMATIC MODE (4)
+	//				NORTH -> SEMI-AUTOMATIC MODE (12)
+	//			    WEST  -> PAUSE MODE (SLEEP) (8)
+	// 				EAST  -> STOP MODE (REINITIALIZE) (0)
+
+	/* starts the threads that controls the movement of the robot
+	move_start(); doit recuperer le mode */
+	//chprintf((BaseSequentialStream *) &SD3, "mode = %d\r\n", mode);
+
+	/*mode = get_selector();
+	/if(mode == 4){
+		chprintf((BaseSequentialStream *) &SD3, "AUTOMATIC\r\n");
+	}
+	else if (mode == 12){
+		chprintf((BaseSequentialStream *) &SD3, "SEMI-AUTO\r\n");;
+	}
+	else
+		return 0;*/
 
     /* Infinite loop. */
     while (1){
 
-       	uint8_t test;
-        test = get_selector();
-        chprintf((BaseSequentialStream *) &SD3, "mode = %d\n", test);
+    	/*pause = get_selector();
+    	if(pause == 8){
+    		chprintf((BaseSequentialStream *) &SD3, "PAUSE\r\n");
+    		//pause_function, arret des moteurs, allumage de LEDS
+    	}
+    	else {
+    		chprintf((BaseSequentialStream *) &SD3, "WORKING\r\n");
+    	}*/
 
-        chThdSleepMilliseconds(5000); //waits 1 second
+    	chThdSleepMilliseconds(1000); //waits 1 second
     }
 }
 

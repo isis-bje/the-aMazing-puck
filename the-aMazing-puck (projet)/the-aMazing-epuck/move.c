@@ -16,7 +16,7 @@ void print_measures(int32_t path[NB_CAPTEURS]);
 
 int8_t steps_to_cm(int16_t nb_steps);
 int16_t cm_to_steps(int8_t dist_cm);
-uint8_t move_command(uint8_t node_type, bool state);
+//uint8_t move_command(uint8_t node_type, bool state);
 
 
 //Thread that controls the movement of the robot
@@ -32,14 +32,10 @@ static THD_FUNCTION(ThdMove, arg)
 	int32_t path_cal[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	while(1){
-		//print_calibrated_measures(path_cal);
-		//junction_detection(path, node_type);
-		//print_measures(path);
 
-		chThdSleepMilliseconds(SLEEP_TIME);
+		junction_detection(path, node_type);
 	}
-
-
+	chThdSleepMilliseconds(SLEEP_TIME);
 }
 
 //-------------------------------------------------------------------------------------
@@ -103,7 +99,7 @@ int junction_detection(int32_t find_path[], uint8_t node_type){
 	}
 
 	//test printf
-	chprintf((BaseSequentialStream *) &SD3, "node_type = %d\n", node_type);
+	chprintf((BaseSequentialStream *) &SD3, "node_type = %d\r\n", node_type);
 
 	return node_type;
 }
@@ -195,30 +191,27 @@ void print_calibrated_measures(int32_t path_cal[]){
 
 	measure_dist_cal(path_cal);
 
-	//chprintf((BaseSequentialStream *) &SD3, "Capteur front left calibrated: %d \n", path_cal[FRONT_LEFT]);
-	//chprintf((BaseSequentialStream *) &SD3, "Capteur front right calibrated: %d \n", path_cal[FRONT_RIGHT]);
-	//chprintf((BaseSequentialStream *) &SD3, "Capteur front side left calibrated: %d \n", path_cal[FRONT_SIDE_LEFT]);
-	//chprintf((BaseSequentialStream *) &SD3, "Capteur front side right calibrated: %d \n", path_cal[FRONT_SIDE_RIGHT]);
-	//chprintf((BaseSequentialStream *) &SD3, "Capteur side left calibrated: %d \n", path_cal[SIDE_LEFT]);
-	//chprintf((BaseSequentialStream *) &SD3, "Capteur side right calibrated: %d \n", path_cal[SIDE_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front left calibrated: %d \n", path_cal[FRONT_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front right calibrated: %d \n", path_cal[FRONT_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front side left calibrated: %d \n", path_cal[FRONT_SIDE_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front side right calibrated: %d \n", path_cal[FRONT_SIDE_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur side left calibrated: %d \n", path_cal[SIDE_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur side right calibrated: %d \n", path_cal[SIDE_RIGHT]);
 
-	chprintf((BaseSequentialStream *) &SD3, "MEASURES CALIBRATED\r\n");
 }
 
 void print_measures(int32_t path[]){
 
-	/*chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \n", path[FRONT_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \n", path[FRONT_LEFT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \n", path[FRONT_RIGHT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur front side left: %d \n", path[FRONT_SIDE_LEFT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \n", path[FRONT_SIDE_RIGHT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \n", path[SIDE_LEFT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", path[SIDE_RIGHT]);*/
-
-	chprintf((BaseSequentialStream *) &SD3, "MEASURES\r\n" );
+	chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", path[SIDE_RIGHT]);
 }
 
-void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS])
-{
+void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]){
+
 	dist_cal[FRONT_RIGHT] = get_calibrated_prox(FRONT_RIGHT);
 	dist_cal[FRONT_LEFT] = get_calibrated_prox(FRONT_LEFT);
 	dist_cal[FRONT_SIDE_RIGHT] = get_calibrated_prox(FRONT_SIDE_RIGHT);
@@ -227,8 +220,8 @@ void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS])
 	dist_cal[SIDE_LEFT] = get_calibrated_prox(SIDE_LEFT);
 }
 
-void measure_dist(int32_t dist[NB_CAPTEURS])
-{
+void measure_dist(int32_t dist[NB_CAPTEURS]){
+
 	dist[FRONT_RIGHT] = get_prox(FRONT_RIGHT);
 	dist[FRONT_LEFT] = get_prox(FRONT_LEFT);
 	dist[FRONT_SIDE_RIGHT] = get_prox(FRONT_SIDE_RIGHT);
@@ -237,12 +230,12 @@ void measure_dist(int32_t dist[NB_CAPTEURS])
 	dist[SIDE_LEFT] = get_prox(SIDE_LEFT);
 }
 
-int8_t steps_to_cm(int16_t nb_steps) // from -100 - 100 cm to -32000 - 32000 steps
-{
+int8_t steps_to_cm(int16_t nb_steps){ // from -100 - 100 cm to -32000 - 32000 steps
+
 	return nb_steps*WHEEL_PERIMETER/NBSTEPS_ONE_TURN;
 }
 
-int16_t cm_to_steps(int8_t dist_cm) // from -100 - 100 cm to -32000 - 32000 steps
-{
+int16_t cm_to_steps(int8_t dist_cm){ // from -100 - 100 cm to -32000 - 32000 steps
+
 	return dist_cm*NBSTEPS_ONE_TURN/WHEEL_PERIMETER;
 }
