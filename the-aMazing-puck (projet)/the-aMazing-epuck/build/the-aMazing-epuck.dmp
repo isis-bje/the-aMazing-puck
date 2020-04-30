@@ -56,21 +56,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
  17 .comment      0000007e  00000000  00000000  00021231  2**0
                   CONTENTS, READONLY
- 18 .debug_info   000cf46c  00000000  00000000  000212af  2**0
+ 18 .debug_info   000cf539  00000000  00000000  000212af  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_abbrev 0000e6c7  00000000  00000000  000f071b  2**0
+ 19 .debug_abbrev 0000e6c9  00000000  00000000  000f07e8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 20 .debug_aranges 00001858  00000000  00000000  000fede2  2**0
+ 20 .debug_aranges 00001870  00000000  00000000  000feeb1  2**0
                   CONTENTS, READONLY, DEBUGGING
- 21 .debug_ranges 00003540  00000000  00000000  0010063a  2**0
+ 21 .debug_ranges 00003558  00000000  00000000  00100721  2**0
                   CONTENTS, READONLY, DEBUGGING
- 22 .debug_line   00024a08  00000000  00000000  00103b7a  2**0
+ 22 .debug_line   00026a73  00000000  00000000  00103c79  2**0
                   CONTENTS, READONLY, DEBUGGING
- 23 .debug_str    000079bf  00000000  00000000  00128582  2**0
+ 23 .debug_str    000079bc  00000000  00000000  0012a6ec  2**0
                   CONTENTS, READONLY, DEBUGGING
- 24 .debug_frame  00007310  00000000  00000000  0012ff44  2**2
+ 24 .debug_frame  000073bc  00000000  00000000  001320a8  2**2
                   CONTENTS, READONLY, DEBUGGING
- 25 .debug_loc    0001360f  00000000  00000000  00137254  2**0
+ 25 .debug_loc    0001360f  00000000  00000000  00139464  2**0
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 08000000 l    d  startup	00000000 startup
@@ -126,12 +126,12 @@ e000ed04 l       *ABS*	00000000 SCB_ICSR
 00000000 l    df *ABS*	00000000 _arm_cmpdf2.o
 00000000 l    df *ABS*	00000000 _arm_unorddf2.o
 00000000 l    df *ABS*	00000000 main.c
-20000820 l     O .data	0000000c ser_cfg.12657
+20000820 l     O .data	0000000c ser_cfg.12665
 00000000 l    df *ABS*	00000000 move.c
 08001340 l     F .text	00000038 chprintf.constprop.0
 080014a0 l     F .text	00000034 ThdMove
 20001210 l     O .bss	00000378 waThdMove
-0800e7b0 l     O .text	00000008 __FUNCTION__.9926
+0800e7b0 l     O .text	00000008 __FUNCTION__.9934
 00000000 l    df *ABS*	00000000 dcmi_lld.c
 080014e0 l     F .text	0000004c dcmi_lld_stop_stream.part.0
 00000000 l    df *ABS*	00000000 memory_protection.c

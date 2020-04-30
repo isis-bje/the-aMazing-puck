@@ -36,8 +36,8 @@ static void serial_start(void){
 
 int main(void){
 
-	static uint8_t mode;
-	static uint8_t pause;
+	//static uint8_t mode;
+	//static uint8_t pause;
 
 	halInit();
     chSysInit();

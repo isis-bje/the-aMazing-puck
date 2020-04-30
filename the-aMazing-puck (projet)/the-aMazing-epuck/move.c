@@ -239,3 +239,23 @@ int16_t cm_to_steps(int8_t dist_cm){ // from -100 - 100 cm to -32000 - 32000 ste
 
 	return dist_cm*NBSTEPS_ONE_TURN/WHEEL_PERIMETER;
 }
+
+void turn_right(){
+	left_motor_set_speed(500);
+	right_motor_set_speed(-500);
+}
+
+void turn_left(){
+	left_motor_set_speed(-500);
+	right_motor_set_speed(500);
+}
+
+void go_forward(){
+	left_motor_set_speed(500);
+	right_motor_set_speed(500);
+}
+
+void half_turn(){
+	left_motor_set_speed(-500);
+	right_motor_set_speed(500);
+}
