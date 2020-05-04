@@ -244,28 +244,22 @@ void stop(){
 
 void turn_right_90(){
 	int left_motor_pos = 0;
-	int right_motor_pos = 0;
 	left_motor_set_pos(0);
-	right_motor_set_pos(0);
 	left_motor_set_speed(500);
 	right_motor_set_speed(-500);
-	while(left_motor_pos < QUARTER_TURN || right_motor_pos < QUARTER_TURN){   //boucle  tant qu'un quart de tour n'a pas été fait
+	while(left_motor_pos < QUARTER_TURN){   //boucle  tant qu'un quart de tour n'a pas été fait
 		left_motor_pos = left_motor_get_pos();
-		right_motor_pos = right_motor_get_pos();
 	}
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
 
 
 void turn_left_90(){
-	int left_motor_pos = 0;
 	int right_motor_pos = 0;
-	left_motor_set_pos(0);
 	right_motor_set_pos(0);
 	left_motor_set_speed(-500);
 	right_motor_set_speed(500);
-	while(left_motor_pos < QUARTER_TURN || right_motor_pos < QUARTER_TURN){
-		left_motor_pos = left_motor_get_pos();
+	while(right_motor_pos < QUARTER_TURN){
 		right_motor_pos = right_motor_get_pos();
 	}
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
@@ -284,14 +278,11 @@ void go_forward(){ //fonction de déplacement en ligne droite avec régulateur pro
 }
 
 void half_turn(){
-	int left_motor_pos = 0;
 	int right_motor_pos = 0;
-	left_motor_set_pos(0);
 	right_motor_set_pos(0);
 	left_motor_set_speed(-500);
 	right_motor_set_speed(500);
-	while(left_motor_pos < DOUBLE*QUARTER_TURN || right_motor_pos < DOUBLE*QUARTER_TURN){     //doublé pour faire un demi-tour (HALF_TURN était déjà pris)
-		left_motor_pos = left_motor_get_pos();
+	while(right_motor_pos < DOUBLE*QUARTER_TURN){     //doublé pour faire un demi-tour (HALF_TURN était déjà pris)
 		right_motor_pos = right_motor_get_pos();
 	}
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
