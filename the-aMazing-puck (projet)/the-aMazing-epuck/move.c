@@ -7,7 +7,7 @@
 #include <sensors/proximity.h>
 #include <motors.h>
 
-int junction_detection(int32_t find_path[NB_CAPTEURS], uint8_t node_type);
+uint8_t junction_detection(int32_t find_path[NB_CAPTEURS]);
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]);
 void measure_dist(int32_t dist[NB_CAPTEURS]);
 
@@ -16,7 +16,7 @@ void print_measures(int32_t path[NB_CAPTEURS]);
 
 int8_t steps_to_cm(int16_t nb_steps);
 int16_t cm_to_steps(int8_t dist_cm);
-//uint8_t move_command(uint8_t node_type, bool state);
+void move_command(uint8_t node_type/*, bool state*/);
 
 
 //Thread that controls the movement of the robot
@@ -29,13 +29,13 @@ static THD_FUNCTION(ThdMove, arg)
 
     uint8_t node_type = 0;
 	int32_t path[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
-	int32_t path_cal[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
+	/*int32_t path_cal[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};*/
 
 	while(1){
 
-		//junction_detection(path, node_type);
-		chprintf((BaseSequentialStream *) &SD3, "Merde");
-		turn_left();
+		node_type = junction_detection(path);
+		move_command(node_type);
+
 		chThdSleepMilliseconds(SLEEP_TIME);
 	}
 
@@ -58,8 +58,8 @@ void move_start(void){
 // INTERNAL FUNCTIONS
 
 //algorithme de d�tection du type de jonction
-int junction_detection(int32_t find_path[], uint8_t node_type){
-
+uint8_t junction_detection(int32_t find_path[]){
+	uint8_t node_type = 0;
 	measure_dist(find_path);
 
 	if(find_path[FRONT_LEFT] < THRESHOLD_WALL && find_path[FRONT_RIGHT] < THRESHOLD_WALL) //si passage devant ouvert
@@ -100,95 +100,88 @@ int junction_detection(int32_t find_path[], uint8_t node_type){
 			node_type = CUL_DE_SAC;
 		}
 	}
-
-	//test printf
-	chprintf((BaseSequentialStream *) &SD3, "node_type = %d\r\n", node_type);
-
 	return node_type;
 }
 
-/*uint8_t move_command(uint8_t node_type, bool state){
+void move_command(uint8_t node_type/*, bool state*/){
 
-	uint8_t command = 0;
-
-	if(state) //automatic mode
-	{
+	/*if(state) //automatic mode
+	{*/
 		switch(node_type)
 		{
 			case CROSSROAD :
-				command = TURN_RIGHT;
+				turn_right();
 				break;
 
 			case T_JUNCTION_LEFT :
-				command = FORWARD;
+				go_forward();
 				break;
 
 			case T_JUNCTION_RIGHT :
-				command = TURN_RIGHT;
+				turn_right();
 				break;
 
 			case T_JUNCTION :
-				command = TURN_RIGHT;
+				turn_right();
 				break;
 
 			default :
 				break;
 		}
-	}
+	/*}
 	else //semi-automatic mode
 	{
 		switch(node_type)
 		{
 			case CROSSROAD :
-				command = get_sound_order();
+				get_sound_order();
 				break;
 
 			case T_JUNCTION_LEFT :
-				command = get_sound_order();
+				get_sound_order();
 				break;
 
 			case T_JUNCTION_RIGHT :
-				command = get_sound_order();
+				get_sound_order();
 				break;
 
 			case T_JUNCTION :
-				command = get_sound_order();
+				get_sound_order();
 				break;
 
 			default :
 				break;
 		}
-	}
+	}*/
 
 	switch(node_type)
 	{
 		case NODE_ERROR :
-			command = STOP;
+			stop();
 			chprintf((BaseSequentialStream *) &SD3, "error");
 			break;
 
 		case STRAIGHT_PATH :
-			command = FORWARD;
+			go_forward();
 			break;
 
 		case CORNER_LEFT :
-			command = TURN_LEFT;
+			turn_left();
 			break;
 
 		case CORNER_RIGHT :
-			command = TURN_RIGHT;
+			turn_right();
 			break;
 
 		case CUL_DE_SAC :
-			command = HALF_TURN;
+			half_turn();
 			break;
 
 		default :
 			break;
 	}
-	return command;
 }
-*/
+
 
 void print_calibrated_measures(int32_t path_cal[]){
 
@@ -241,6 +234,11 @@ int8_t steps_to_cm(int16_t nb_steps){ // from -100 - 100 cm to -32000 - 32000 st
 int16_t cm_to_steps(int8_t dist_cm){ // from -100 - 100 cm to -32000 - 32000 steps
 
 	return dist_cm*NBSTEPS_ONE_TURN/WHEEL_PERIMETER;
+}
+
+void stop(){
+	left_motor_set_speed(0);
+	right_motor_set_speed(0);
 }
 
 void turn_right(){

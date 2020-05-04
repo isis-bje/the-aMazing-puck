@@ -22,6 +22,7 @@ enum commands{STOP, FORWARD, TURN_LEFT, TURN_RIGHT, HALF_TURN};
 #define NBSTEPS_ONE_TURN			1000
 
 void move_start(void);
+void stop(void);
 void turn_right(void);
 void turn_left(void);
 void go_forward(void);
