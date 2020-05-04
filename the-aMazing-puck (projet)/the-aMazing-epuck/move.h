@@ -20,8 +20,8 @@ enum commands{STOP, FORWARD, TURN_LEFT, TURN_RIGHT, HALF_TURN};
 
 #define WHEEL_PERIMETER				13
 #define NBSTEPS_ONE_TURN			1000
-#define QUARTER_TURN				NBSTEPS_ONE_TURN/4
-#define DOUBLE						2
+#define QUARTER_TURN_ABS       		NBSTEPS_ONE_TURN/4
+#define HALF_TURN_ABS				NBSTEPS_ONE_TURN/2
 #define KP							10 //? valeur choisie au hasard (en l'attente de tests)
 
 void move_start(void);

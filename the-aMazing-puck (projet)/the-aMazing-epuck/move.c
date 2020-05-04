@@ -57,7 +57,7 @@ void move_start(void){
 
 // INTERNAL FUNCTIONS
 
-//algorithme de dï¿½tection du type de jonction
+//algorithme de detection du type de jonction
 uint8_t junction_detection(int32_t find_path[]){
 	uint8_t node_type = 0;
 	measure_dist(find_path);
@@ -100,6 +100,9 @@ uint8_t junction_detection(int32_t find_path[]){
 			node_type = CUL_DE_SAC;
 		}
 	}
+
+	chprintf((BaseSequentialStream *) &SD3, "node_type: %d\r\n", node_type);
+
 	return node_type;
 }
 
@@ -243,47 +246,70 @@ void stop(){
 }
 
 void turn_right_90(){
+
 	int left_motor_pos = 0;
+
 	left_motor_set_pos(0);
 	left_motor_set_speed(500);
 	right_motor_set_speed(-500);
-	while(left_motor_pos < QUARTER_TURN){   //boucle  tant qu'un quart de tour n'a pas été fait
+
+	while(left_motor_pos < QUARTER_TURN_ABS){   //boucle  tant qu'un quart de tour n'a pas été fait
+
 		left_motor_pos = left_motor_get_pos();
+		chprintf((BaseSequentialStream *) &SD3, "turn right 90\r\n");
 	}
+
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
 
 
 void turn_left_90(){
+
 	int right_motor_pos = 0;
+
 	right_motor_set_pos(0);
 	left_motor_set_speed(-500);
 	right_motor_set_speed(500);
-	while(right_motor_pos < QUARTER_TURN){
+
+	while(right_motor_pos < QUARTER_TURN_ABS){
+
 		right_motor_pos = right_motor_get_pos();
+		chprintf((BaseSequentialStream *) &SD3, "turn left 90\r\n");
 	}
+
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
 
 void go_forward(){ //fonction de déplacement en ligne droite avec régulateur proportionnel
+
 	int32_t error = get_prox(SIDE_RIGHT) - get_prox(SIDE_LEFT);
+
 	if(error > 0){
+
 		left_motor_set_speed(500 - error*KP);
 		right_motor_set_speed(500 + error*KP);
 	}
+
 	else{
+
 		left_motor_set_speed(500 + error*KP);
 		right_motor_set_speed(500 - error*KP);
 	}
 }
 
 void half_turn(){
+
 	int right_motor_pos = 0;
+
 	right_motor_set_pos(0);
 	left_motor_set_speed(-500);
 	right_motor_set_speed(500);
-	while(right_motor_pos < DOUBLE*QUARTER_TURN){     //doublé pour faire un demi-tour (HALF_TURN était déjà pris)
+
+	while(right_motor_pos < HALF_TURN_ABS){     //doublé pour faire un demi-tour (HALF_TURN était déjà pris)
+
 		right_motor_pos = right_motor_get_pos();
+		chprintf((BaseSequentialStream *) &SD3, "half turn\r\n");
 	}
+
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
