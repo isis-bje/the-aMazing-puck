@@ -110,7 +110,7 @@ void move_command(uint8_t node_type/*, bool state*/){
 		switch(node_type)
 		{
 			case CROSSROAD :
-				turn_right();
+				turn_right_90();
 				break;
 
 			case T_JUNCTION_LEFT :
@@ -118,11 +118,11 @@ void move_command(uint8_t node_type/*, bool state*/){
 				break;
 
 			case T_JUNCTION_RIGHT :
-				turn_right();
+				turn_right_90();
 				break;
 
 			case T_JUNCTION :
-				turn_right();
+				turn_right_90();
 				break;
 
 			default :
@@ -166,11 +166,11 @@ void move_command(uint8_t node_type/*, bool state*/){
 			break;
 
 		case CORNER_LEFT :
-			turn_left();
+			turn_left_90();
 			break;
 
 		case CORNER_RIGHT :
-			turn_right();
+			turn_right_90();
 			break;
 
 		case CUL_DE_SAC :
@@ -237,26 +237,62 @@ int16_t cm_to_steps(int8_t dist_cm){ // from -100 - 100 cm to -32000 - 32000 ste
 }
 
 void stop(){
+
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
 }
 
-void turn_right(){
+void turn_right_90(){
+	int left_motor_pos = 0;
+	int right_motor_pos = 0;
+	left_motor_set_pos(0);
+	right_motor_set_pos(0);
 	left_motor_set_speed(500);
 	right_motor_set_speed(-500);
+	while(left_motor_pos < QUARTER_TURN || right_motor_pos < QUARTER_TURN){   //boucle  tant qu'un quart de tour n'a pas été fait
+		left_motor_pos = left_motor_get_pos();
+		right_motor_pos = right_motor_get_pos();
+	}
+	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
 
-void turn_left(){
+
+void turn_left_90(){
+	int left_motor_pos = 0;
+	int right_motor_pos = 0;
+	left_motor_set_pos(0);
+	right_motor_set_pos(0);
 	left_motor_set_speed(-500);
 	right_motor_set_speed(500);
+	while(left_motor_pos < QUARTER_TURN || right_motor_pos < QUARTER_TURN){
+		left_motor_pos = left_motor_get_pos();
+		right_motor_pos = right_motor_get_pos();
+	}
+	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
 
-void go_forward(){
-	left_motor_set_speed(500);
-	right_motor_set_speed(500);
+void go_forward(){ //fonction de déplacement en ligne droite avec régulateur proportionnel
+	int32_t error = get_prox(SIDE_RIGHT) - get_prox(SIDE_LEFT);
+	if(error > 0){
+		left_motor_set_speed(500 - error*KP);
+		right_motor_set_speed(500 + error*KP);
+	}
+	else{
+		left_motor_set_speed(500 + error*KP);
+		right_motor_set_speed(500 - error*KP);
+	}
 }
 
 void half_turn(){
+	int left_motor_pos = 0;
+	int right_motor_pos = 0;
+	left_motor_set_pos(0);
+	right_motor_set_pos(0);
 	left_motor_set_speed(-500);
 	right_motor_set_speed(500);
+	while(left_motor_pos < DOUBLE*QUARTER_TURN || right_motor_pos < DOUBLE*QUARTER_TURN){     //doublé pour faire un demi-tour (HALF_TURN était déjà pris)
+		left_motor_pos = left_motor_get_pos();
+		right_motor_pos = right_motor_get_pos();
+	}
+	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
