@@ -6,6 +6,7 @@
 #include <usbcfg.h>
 #include <sensors/proximity.h>
 #include <motors.h>
+#include <leds.h>
 
 uint8_t junction_detection(int32_t find_path[NB_CAPTEURS]);
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]);
@@ -247,6 +248,8 @@ void stop(){
 
 void turn_right_90(){
 
+	set_led(LED3, ON);
+
 	int left_motor_pos = 0;
 
 	left_motor_set_pos(0);
@@ -258,12 +261,14 @@ void turn_right_90(){
 		left_motor_pos = left_motor_get_pos();
 		chprintf((BaseSequentialStream *) &SD3, "turn right 90\r\n");
 	}
-
+	set_led(LED3, OFF);
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
 
 
 void turn_left_90(){
+
+	set_led(LED7, ON);
 
 	int right_motor_pos = 0;
 
@@ -276,14 +281,14 @@ void turn_left_90(){
 		right_motor_pos = right_motor_get_pos();
 		chprintf((BaseSequentialStream *) &SD3, "turn left 90\r\n");
 	}
-
+	set_led(LED7, OFF);
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
 
 void go_forward(){ //fonction de déplacement en ligne droite avec régulateur proportionnel
 
 	int32_t error = get_prox(SIDE_RIGHT) - get_prox(SIDE_LEFT);
-
+	set_led(LED1, ON);
 	if(error > 0){
 
 		left_motor_set_speed(500 - error*KP);
@@ -295,9 +300,12 @@ void go_forward(){ //fonction de déplacement en ligne droite avec régulateur pro
 		left_motor_set_speed(500 + error*KP);
 		right_motor_set_speed(500 - error*KP);
 	}
+	set_led(LED3, OFF);
 }
 
 void half_turn(){
+
+	set_led(LED5, ON);
 
 	int right_motor_pos = 0;
 
@@ -310,6 +318,6 @@ void half_turn(){
 		right_motor_pos = right_motor_get_pos();
 		chprintf((BaseSequentialStream *) &SD3, "half turn\r\n");
 	}
-
+	set_led(LED5, OFF);
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }

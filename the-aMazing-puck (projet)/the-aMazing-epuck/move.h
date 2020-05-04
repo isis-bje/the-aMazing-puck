@@ -23,6 +23,8 @@ enum commands{STOP, FORWARD, TURN_LEFT, TURN_RIGHT, HALF_TURN};
 #define QUARTER_TURN_ABS       		NBSTEPS_ONE_TURN/4
 #define HALF_TURN_ABS				NBSTEPS_ONE_TURN/2
 #define KP							10 //? valeur choisie au hasard (en l'attente de tests)
+#define ON							1
+#define OFF							0
 
 void move_start(void);
 void stop(void);
