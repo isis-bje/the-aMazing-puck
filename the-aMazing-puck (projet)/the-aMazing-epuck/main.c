@@ -1,3 +1,10 @@
+/*
+ * main.c
+ *
+ *  Created on: 15 Apr 2020
+ *      Author: Julien MOREL et Isis BOU JAOUDE
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

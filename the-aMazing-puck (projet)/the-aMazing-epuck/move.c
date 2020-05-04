@@ -33,9 +33,12 @@ static THD_FUNCTION(ThdMove, arg)
 
 	while(1){
 
-		junction_detection(path, node_type);
+		//junction_detection(path, node_type);
+		chprintf((BaseSequentialStream *) &SD3, "Merde");
+		turn_left();
+		chThdSleepMilliseconds(SLEEP_TIME);
 	}
-	chThdSleepMilliseconds(SLEEP_TIME);
+
 }
 
 //-------------------------------------------------------------------------------------
@@ -54,22 +57,22 @@ void move_start(void){
 
 // INTERNAL FUNCTIONS
 
-//algorithme de détection du type de jonction
+//algorithme de dï¿½tection du type de jonction
 int junction_detection(int32_t find_path[], uint8_t node_type){
 
 	measure_dist(find_path);
 
 	if(find_path[FRONT_LEFT] < THRESHOLD_WALL && find_path[FRONT_RIGHT] < THRESHOLD_WALL) //si passage devant ouvert
 	{
-		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage à gauche et à droite
+		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage ï¿½ gauche et ï¿½ droite
 		{
 			node_type = CROSSROAD;
 		}
-		else if(find_path[SIDE_LEFT] < THRESHOLD_WALL) //si passage à gauche
+		else if(find_path[SIDE_LEFT] < THRESHOLD_WALL) //si passage ï¿½ gauche
 		{
 			node_type = T_JUNCTION_LEFT;
 		}
-		else if(find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage à droite
+		else if(find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage ï¿½ droite
 		{
 			node_type = T_JUNCTION_RIGHT;
 		}
@@ -80,15 +83,15 @@ int junction_detection(int32_t find_path[], uint8_t node_type){
 	}
 	else //si pas de passage devant
 	{
-		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage à gauche et à droite
+		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage ï¿½ gauche et ï¿½ droite
 		{
 			node_type = T_JUNCTION;
 		}
-		else if(find_path[SIDE_LEFT] < THRESHOLD_WALL) //si passage à gauche
+		else if(find_path[SIDE_LEFT] < THRESHOLD_WALL) //si passage ï¿½ gauche
 		{
 			node_type = CORNER_LEFT;
 		}
-		else if(find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage à droite
+		else if(find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage ï¿½ droite
 		{
 			node_type = CORNER_RIGHT;
 		}

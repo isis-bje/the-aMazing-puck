@@ -1,9 +1,3 @@
-/*
- * move.h
- *
- *  Created on: 15 Apr 2020
- *      Author: Julien MOREL et Isis BOU JAOUDE
- */
 
 #ifndef MOVE_H_
 #define MOVE_H_
