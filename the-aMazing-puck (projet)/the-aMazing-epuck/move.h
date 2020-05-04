@@ -20,9 +20,9 @@ enum commands{STOP, FORWARD, TURN_LEFT, TURN_RIGHT, HALF_TURN};
 
 #define WHEEL_PERIMETER				13
 #define NBSTEPS_ONE_TURN			1000
-#define QUARTER_TURN_ABS       		NBSTEPS_ONE_TURN/4
-#define HALF_TURN_ABS				NBSTEPS_ONE_TURN/2
-#define KP							10 //? valeur choisie au hasard (en l'attente de tests)
+#define QUARTER_TURN_ABS       		423
+#define HALF_TURN_ABS				846
+#define KP							0 //? valeur choisie au hasard (en l'attente de tests)
 #define ON							1
 #define OFF							0
 
