@@ -35,9 +35,9 @@ static THD_FUNCTION(ThdMove, arg)
 	while(1){
 
 		node_type = junction_detection(path);
-		print_measures(path);
+		//print_measures(path);
 
-		//move_command(node_type);
+		move_command(node_type);
 
 		chThdSleepMilliseconds(5*SLEEP_TIME);
 	}
@@ -69,15 +69,15 @@ uint8_t junction_detection(int32_t find_path[]){
 
 	if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT) //si passage devant ouvert
 	{
-		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage ï¿½ gauche et ï¿½ droite
+		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage à gauche et à droite
 		{
 			node_type = CROSSROAD;
 		}
-		else if(find_path[SIDE_LEFT] < THRESHOLD_WALL) //si passage ï¿½ gauche
+		else if(find_path[SIDE_LEFT] < THRESHOLD_WALL) //si passage à gauche
 		{
 			node_type = T_JUNCTION_LEFT;
 		}
-		else if(find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage ï¿½ droite
+		else if(find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage à droite
 		{
 			node_type = T_JUNCTION_RIGHT;
 		}
@@ -119,18 +119,25 @@ void move_command(uint8_t node_type/*, bool state*/){
 		{
 			case CROSSROAD :
 				turn_right_90();
+				go_forward();
+				chThdSleepMilliseconds(SLEEP_TIME);
 				break;
 
 			case T_JUNCTION_LEFT :
 				go_forward();
+				chThdSleepMilliseconds(SLEEP_TIME);
 				break;
 
 			case T_JUNCTION_RIGHT :
 				turn_right_90();
+				go_forward();
+				chThdSleepMilliseconds(SLEEP_TIME);
 				break;
 
 			case T_JUNCTION :
 				turn_right_90();
+				go_forward();
+				chThdSleepMilliseconds(SLEEP_TIME);
 				break;
 
 			default :
@@ -170,19 +177,25 @@ void move_command(uint8_t node_type/*, bool state*/){
 			break;
 
 		case STRAIGHT_PATH :
-			go_forward();
+			go_forward_regulator();
 			break;
 
 		case CORNER_LEFT :
 			turn_left_90();
+			go_forward();
+			chThdSleepMilliseconds(SLEEP_TIME);
 			break;
 
 		case CORNER_RIGHT :
 			turn_right_90();
+			go_forward();
+			chThdSleepMilliseconds(SLEEP_TIME);
 			break;
 
 		case CUL_DE_SAC :
 			half_turn();
+			go_forward();
+			chThdSleepMilliseconds(SLEEP_TIME);
 			break;
 
 		default :
@@ -302,7 +315,7 @@ void turn_left_90(){
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
 }
 
-void go_forward(){ //fonction de déplacement en ligne droite avec régulateur proportionnel
+void go_forward_regulator(){ //fonction de déplacement en ligne droite avec régulateur proportionnel
 
 	int32_t error = get_prox(SIDE_RIGHT) - get_prox(SIDE_LEFT);
 	set_led(LED1, ON);
@@ -317,6 +330,13 @@ void go_forward(){ //fonction de déplacement en ligne droite avec régulateur pro
 		left_motor_set_speed(500 + error*KP);
 		right_motor_set_speed(500 - error*KP);
 	}
+	set_led(LED3, OFF);
+}
+
+void go_forward(){ //déplacement en ligne droite sans régulateur afin de sortir des jonctions
+	set_led(LED1, ON);
+	left_motor_set_speed(500);
+	right_motor_set_speed(500);
 	set_led(LED3, OFF);
 }
 
