@@ -118,8 +118,11 @@ void move_command(uint8_t node_type/*, bool state*/){
 		switch(node_type)
 		{
 			case CROSSROAD :
+				go_forward();
+				chThdSleepMilliseconds(NAP_TIME);
 				turn_right_90();
 				go_forward();
+				chThdSleepMilliseconds(NAP_TIME);
 				break;
 
 			case T_JUNCTION_LEFT :
@@ -127,13 +130,19 @@ void move_command(uint8_t node_type/*, bool state*/){
 				break;
 
 			case T_JUNCTION_RIGHT :
+				go_forward();
+				chThdSleepMilliseconds(NAP_TIME);
 				turn_right_90();
 				go_forward();
+				chThdSleepMilliseconds(NAP_TIME);
 				break;
 
 			case T_JUNCTION :
+				go_forward();
+				chThdSleepMilliseconds(NAP_TIME);
 				turn_right_90();
 				go_forward();
+				chThdSleepMilliseconds(NAP_TIME);
 				break;
 
 			default :
@@ -177,13 +186,19 @@ void move_command(uint8_t node_type/*, bool state*/){
 			break;
 
 		case CORNER_LEFT :
+			go_forward();
+			chThdSleepMilliseconds(NAP_TIME);
 			turn_left_90();
 			go_forward();
+			chThdSleepMilliseconds(NAP_TIME);
 			break;
 
 		case CORNER_RIGHT :
+			go_forward();
+			chThdSleepMilliseconds(NAP_TIME);
 			turn_right_90();
 			go_forward();
+			chThdSleepMilliseconds(NAP_TIME);
 			break;
 
 		case CUL_DE_SAC :
