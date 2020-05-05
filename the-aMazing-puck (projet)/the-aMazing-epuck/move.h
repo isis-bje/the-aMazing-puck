@@ -24,7 +24,7 @@ enum flip{OFF, ON};
 #define NBSTEPS_ONE_TURN			1000
 #define QUARTER_TURN_ABS       		327 //423 selon le calcul théorique, ajusté expérimentalement pour 1/4 tour
 #define HALF_TURN_ABS				654 //846 selon le calcul théorique, ajusté expérimentalement pour 1/2 tour
-#define KP							0.1 //? valeur choisie au hasard (en l'attente de tests)
+#define KP							0 //? valeur choisie au hasard (en l'attente de tests)
 
 #define SLEEP_TIME				 	1000
 

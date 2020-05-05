@@ -39,7 +39,7 @@ static THD_FUNCTION(ThdMove, arg)
 
 		move_command(node_type);
 
-		chThdSleepMilliseconds(5*SLEEP_TIME);
+		chThdSleepMilliseconds(SLEEP_TIME);
 	}
 
 }
@@ -120,24 +120,20 @@ void move_command(uint8_t node_type/*, bool state*/){
 			case CROSSROAD :
 				turn_right_90();
 				go_forward();
-				chThdSleepMilliseconds(SLEEP_TIME);
 				break;
 
 			case T_JUNCTION_LEFT :
 				go_forward();
-				chThdSleepMilliseconds(SLEEP_TIME);
 				break;
 
 			case T_JUNCTION_RIGHT :
 				turn_right_90();
 				go_forward();
-				chThdSleepMilliseconds(SLEEP_TIME);
 				break;
 
 			case T_JUNCTION :
 				turn_right_90();
 				go_forward();
-				chThdSleepMilliseconds(SLEEP_TIME);
 				break;
 
 			default :
@@ -183,19 +179,16 @@ void move_command(uint8_t node_type/*, bool state*/){
 		case CORNER_LEFT :
 			turn_left_90();
 			go_forward();
-			chThdSleepMilliseconds(SLEEP_TIME);
 			break;
 
 		case CORNER_RIGHT :
 			turn_right_90();
 			go_forward();
-			chThdSleepMilliseconds(SLEEP_TIME);
 			break;
 
 		case CUL_DE_SAC :
 			half_turn();
 			go_forward();
-			chThdSleepMilliseconds(SLEEP_TIME);
 			break;
 
 		default :
