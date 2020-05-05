@@ -26,7 +26,6 @@ enum flip{OFF, ON};
 #define HALF_TURN_ABS				654 //846 selon le calcul théorique, ajusté expérimentalement pour 1/2 tour
 #define KP							0 //? valeur choisie au hasard (en l'attente de tests)
 
-#define NAP_TIME					200
 #define SLEEP_TIME				 	50
 
 void move_start(void);

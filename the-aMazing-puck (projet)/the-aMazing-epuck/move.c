@@ -118,11 +118,13 @@ void move_command(uint8_t node_type/*, bool state*/){
 		switch(node_type)
 		{
 			case CROSSROAD :
-				go_forward();
-				chThdSleepMilliseconds(NAP_TIME);
+				while(get_prox(FRONT_SIDE_LEFT) < THRESHOLD_WALL && get_prox(FRONT_SIDE_RIGHT) < THRESHOLD_WALL){ //tant que l'e-puck n'est pas entré dans le croisement
+					go_forward();
+				}
 				turn_right_90();
-				go_forward();
-				chThdSleepMilliseconds(NAP_TIME);
+				while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+					go_forward();
+				}
 				break;
 
 			case T_JUNCTION_LEFT :
@@ -130,19 +132,23 @@ void move_command(uint8_t node_type/*, bool state*/){
 				break;
 
 			case T_JUNCTION_RIGHT :
-				go_forward();
-				chThdSleepMilliseconds(NAP_TIME);
+				while(get_prox(FRONT_SIDE_LEFT) < THRESHOLD_WALL && get_prox(FRONT_SIDE_RIGHT) < THRESHOLD_WALL){ //tant que l'e-puck n'est pas entré dans le croisement
+					go_forward();
+				}
 				turn_right_90();
-				go_forward();
-				chThdSleepMilliseconds(NAP_TIME);
+				while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+					go_forward();
+				}
 				break;
 
 			case T_JUNCTION :
-				go_forward();
-				chThdSleepMilliseconds(NAP_TIME);
+				while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
+					go_forward();
+				}
 				turn_right_90();
-				go_forward();
-				chThdSleepMilliseconds(NAP_TIME);
+				while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+					go_forward();
+				}
 				break;
 
 			default :
@@ -186,19 +192,23 @@ void move_command(uint8_t node_type/*, bool state*/){
 			break;
 
 		case CORNER_LEFT :
-			go_forward();
-			chThdSleepMilliseconds(NAP_TIME);
+			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
 			turn_left_90();
-			go_forward();
-			chThdSleepMilliseconds(NAP_TIME);
+			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+				go_forward();
+			}
 			break;
 
 		case CORNER_RIGHT :
-			go_forward();
-			chThdSleepMilliseconds(NAP_TIME);
+			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
 			turn_right_90();
-			go_forward();
-			chThdSleepMilliseconds(NAP_TIME);
+			while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+				go_forward();
+			}
 			break;
 
 		case CUL_DE_SAC :
