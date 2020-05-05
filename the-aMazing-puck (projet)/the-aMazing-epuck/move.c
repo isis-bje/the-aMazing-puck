@@ -35,9 +35,11 @@ static THD_FUNCTION(ThdMove, arg)
 	while(1){
 
 		node_type = junction_detection(path);
-		move_command(node_type);
+		print_measures(path);
 
-		chThdSleepMilliseconds(SLEEP_TIME);
+		//move_command(node_type);
+
+		chThdSleepMilliseconds(5*SLEEP_TIME);
 	}
 
 }
@@ -60,10 +62,12 @@ void move_start(void){
 
 //algorithme de detection du type de jonction
 uint8_t junction_detection(int32_t find_path[]){
+
 	uint8_t node_type = 0;
+
 	measure_dist(find_path);
 
-	if(find_path[FRONT_LEFT] < THRESHOLD_WALL && find_path[FRONT_RIGHT] < THRESHOLD_WALL) //si passage devant ouvert
+	if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT) //si passage devant ouvert
 	{
 		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage ï¿½ gauche et ï¿½ droite
 		{
@@ -202,12 +206,12 @@ void print_calibrated_measures(int32_t path_cal[]){
 
 void print_measures(int32_t path[]){
 
-	chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \n", path[FRONT_LEFT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \n", path[FRONT_RIGHT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur front side left: %d \n", path[FRONT_SIDE_LEFT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \n", path[FRONT_SIDE_RIGHT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \n", path[SIDE_LEFT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \n", path[SIDE_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \r\n", path[FRONT_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \r\n", path[FRONT_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front side left: %d \r\n", path[FRONT_SIDE_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \r\n", path[FRONT_SIDE_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \r\n", path[SIDE_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \r\n", path[SIDE_RIGHT]);
 }
 
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]){
@@ -242,8 +246,22 @@ int16_t cm_to_steps(int8_t dist_cm){ // from -100 - 100 cm to -32000 - 32000 ste
 
 void stop(){
 
+
+	set_led(LED1, ON);
+	set_led(LED3, ON);
+	set_led(LED5, ON);
+	set_led(LED7, ON);
+
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
+
+	chThdSleepMilliseconds(SLEEP_TIME);
+
+	set_led(LED1, OFF);
+	set_led(LED3, OFF);
+	set_led(LED5, OFF);
+	set_led(LED7, OFF);
+
 }
 
 void turn_right_90(){
@@ -259,7 +277,6 @@ void turn_right_90(){
 	while(left_motor_pos < QUARTER_TURN_ABS){   //boucle  tant qu'un quart de tour n'a pas été fait
 
 		left_motor_pos = left_motor_get_pos();
-		chprintf((BaseSequentialStream *) &SD3, "turn right 90\r\n");
 	}
 	set_led(LED3, OFF);
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
@@ -279,7 +296,7 @@ void turn_left_90(){
 	while(right_motor_pos < QUARTER_TURN_ABS){
 
 		right_motor_pos = right_motor_get_pos();
-		chprintf((BaseSequentialStream *) &SD3, "turn left 90\r\n");
+
 	}
 	set_led(LED7, OFF);
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
@@ -316,7 +333,7 @@ void half_turn(){
 	while(right_motor_pos < HALF_TURN_ABS){     //doublé pour faire un demi-tour (HALF_TURN était déjà pris)
 
 		right_motor_pos = right_motor_get_pos();
-		chprintf((BaseSequentialStream *) &SD3, "half turn\r\n");
+
 	}
 	set_led(LED5, OFF);
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
