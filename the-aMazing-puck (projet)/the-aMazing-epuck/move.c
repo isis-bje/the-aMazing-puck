@@ -208,7 +208,7 @@ void move_command(uint8_t node_type, bool state){
 					go_forward();
 				}while(get_prox(BACK_LEFT) > THRESHOLD_BACK); //tant que l'e-puck n'est pas au milieu du croisement
 				stop();
-				GET_VALUE: sound_order = get_sound_order();  // thread de déplacement mise en pause en attendant l'ordre sonore
+				GET_VALUE_L: sound_order = get_sound_order();  // thread de déplacement mise en pause en attendant l'ordre sonore
 				switch(sound_order)
 				{
 					case FORWARD:
@@ -224,7 +224,7 @@ void move_command(uint8_t node_type, bool state){
 						break;
 					case TURN_RIGHT:
 						chprintf((BaseSequentialStream *) &SD3, "I cannot do that \r\n"); // /!\ besoin d'obtenir une valeur valable
-						goto GET_VALUE;
+						goto GET_VALUE_L;
 						break;
 					case HALF_TURN:
 						half_turn();
@@ -243,7 +243,7 @@ void move_command(uint8_t node_type, bool state){
 					go_forward();
 				}while(get_prox(BACK_RIGHT) > THRESHOLD_BACK); //tant que l'e-puck n'est pas au milieu du croisement
 				stop();
-				sound_order = get_sound_order();  // thread de déplacement mise en pause en attendant l'ordre sonore
+				GET_VALUE_R: sound_order = get_sound_order();  // thread de déplacement mise en pause en attendant l'ordre sonore
 				switch(sound_order)
 				{
 					case FORWARD:
@@ -253,7 +253,7 @@ void move_command(uint8_t node_type, bool state){
 						break;
 					case TURN_LEFT:
 						chprintf((BaseSequentialStream *) &SD3, "I cannot do that \r\n"); // /!\ besoin d'obtenir une valeur valable
-						goto GET_VALUE;
+						goto GET_VALUE_R;
 						break;
 					case TURN_RIGHT:
 						turn_right_90();
@@ -278,12 +278,12 @@ void move_command(uint8_t node_type, bool state){
 					go_forward();
 				}while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT); //tant que l'e-puck n'est pas au milieu du croisement
 				stop();
-				sound_order = get_sound_order();  // thread de déplacement mise en pause en attendant l'ordre sonore
+				GET_VALUE_F: sound_order = get_sound_order();  // thread de déplacement mise en pause en attendant l'ordre sonore
 				switch(sound_order)
 				{
 					case FORWARD:
 						chprintf((BaseSequentialStream *) &SD3, "I cannot do that \r\n"); // /!\ besoin d'obtenir une valeur valable
-						goto GET_VALUE;
+						goto GET_VALUE_F;
 						break;
 					case TURN_LEFT:
 						turn_left_90();
