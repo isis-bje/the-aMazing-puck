@@ -75,7 +75,7 @@ int main(void){
     mic_start(&processSound);
 
 	//starts the threads that controls the movement of the robot
-	//move_start();
+	move_start();
 
 	//LAUNCH MODE : SOUTH -> AUTOMATIC MODE (4)
 	//				NORTH -> SEMI-AUTOMATIC MODE (12)

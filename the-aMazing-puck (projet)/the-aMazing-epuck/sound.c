@@ -219,4 +219,35 @@ float* get_audio_buffer_ptr(BUFFER_NAME_t name){
 }
 
 
+uint8_t get_sound_order(){    //code pour obtenir une valeur de 1 à 4 selon l'ordre à donner à l'e-puck
+	//mettre la thread de movement en pause
+	//obtenir une valeur des micros
+	//faire la FFt pour avoir la fréquence
+	//transformer la fréquence en commande
+
+	uint8_t sound_order = 0;
+	uint32_t freq = 0;
+	FREQ: freq = 1; // récupérer ici la fréquence du son du micro
+	switch(freq)
+	{
+		case FREQ_FORWARD:
+			sound_order = FORWARD;
+			break;
+		case FREQ_LEFT:
+			sound_order = TURN_LEFT;
+			break;
+		case FREQ_RIGHT:
+			sound_order = TURN_RIGHT;
+			break;
+		case FREQ_BACKWARD:
+			sound_order = HALF_TURN;
+			break;
+		default:
+			chprintf((BaseSequentialStream *) &SD3, "I didn't understand your command, use another frequency\r\n");
+			goto FREQ;
+			break;
+	}
+	return sound_order;
+}
+
 

@@ -3,6 +3,8 @@
 
 #define FFT_SIZE 	1024
 
+enum commands{STOP, FORWARD, TURN_LEFT, TURN_RIGHT, HALF_TURN};  //  /!\double de l'énum en move.h, pour les ordres selon la fréquence
+
 typedef enum {
 	//2 times FFT_SIZE because these arrays contain complex numbers (real + imaginary)
 	LEFT_CMPLX_INPUT = 0,
@@ -32,6 +34,8 @@ float* get_audio_buffer_ptr(BUFFER_NAME_t name);
 void sound_remote(float* data);
 
 void doFFT_optimized(uint16_t size, float* complex_buffer);
+
+uint8_t get_sound_order(void);
 
 
 #endif
