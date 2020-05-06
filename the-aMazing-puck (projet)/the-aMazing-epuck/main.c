@@ -75,7 +75,7 @@ int main(void){
     mic_start(&processSound);
 
 	//starts the threads that controls the movement of the robot
-	//move_start();
+	move_start();
 
 	//LAUNCH MODE : SOUTH -> AUTOMATIC MODE (4)
 	//				NORTH -> SEMI-AUTOMATIC MODE (12)
@@ -109,9 +109,9 @@ int main(void){
     	}*/
 
     	//waits until a result must be sent to the computer
-    	wait_send_to_computer();
+    	//wait_send_to_computer();
 
-    	SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(LEFT_OUTPUT), FFT_SIZE);
+    	//SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(LEFT_OUTPUT), FFT_SIZE);
 
     	chThdSleepMilliseconds(1000); //waits 1 second
     }

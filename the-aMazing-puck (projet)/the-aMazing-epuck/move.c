@@ -7,6 +7,7 @@
 #include <sensors/proximity.h>
 #include <motors.h>
 #include <leds.h>
+#include <sound.h>
 
 uint8_t junction_detection(int32_t find_path[NB_CAPTEURS]);
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]);
@@ -37,7 +38,8 @@ static THD_FUNCTION(ThdMove, arg)
 		node_type = junction_detection(path);
 		print_measures(path);
 
-		//move_command(node_type);
+		wait_receive_order();
+		move_command(node_type);
 
 		chThdSleepMilliseconds(100*SLEEP_TIME);
 	}
