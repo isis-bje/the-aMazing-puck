@@ -10,18 +10,23 @@
 #include <string.h>
 #include <math.h>
 
+#include <arm_math.h> //?
+
 #include "ch.h"
 #include "hal.h"
 #include "memory_protection.h"
 
 #include <usbcfg.h>
 #include <chprintf.h>
+#include <selector.h>
 #include <motors.h>
 #include <sensors/proximity.h>
-#include <selector.h>
+#include <audio/microphone.h>
 
 #include <main.h>
 #include <move.h>
+#include <sound.h>
+#include <communications.h>
 
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
@@ -62,13 +67,15 @@ int main(void){
     proximity_start();
     calibrate_ir();
 
-    //start the microphone
-
     //initialize the motors
-	motors_init();
+    motors_init();
+
+    //start the microphone
+    //it calls the callback given in parameter when samples are ready
+    mic_start(&processSound);
 
 	//starts the threads that controls the movement of the robot
-	move_start();
+	//move_start();
 
 	//LAUNCH MODE : SOUTH -> AUTOMATIC MODE (4)
 	//				NORTH -> SEMI-AUTOMATIC MODE (12)
@@ -100,6 +107,11 @@ int main(void){
     	else {
     		chprintf((BaseSequentialStream *) &SD3, "WORKING\r\n");
     	}*/
+
+    	//waits until a result must be sent to the computer
+    	wait_send_to_computer();
+
+    	SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(LEFT_OUTPUT), FFT_SIZE);
 
     	chThdSleepMilliseconds(1000); //waits 1 second
     }

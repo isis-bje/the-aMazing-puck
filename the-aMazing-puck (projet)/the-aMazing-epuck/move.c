@@ -35,11 +35,11 @@ static THD_FUNCTION(ThdMove, arg)
 	while(1){
 
 		node_type = junction_detection(path);
-		//print_measures(path);
+		print_measures(path);
 
-		move_command(node_type);
+		//move_command(node_type);
 
-		chThdSleepMilliseconds(SLEEP_TIME);
+		chThdSleepMilliseconds(100*SLEEP_TIME);
 	}
 
 }
@@ -53,7 +53,7 @@ void move_start(void){
 	right_motor_set_speed(0);
 	left_motor_set_speed(0);
 
-	chThdCreateStatic(waThdMove, sizeof(waThdMove), NORMALPRIO, ThdMove, NULL);
+	chThdCreateStatic(waThdMove, sizeof(waThdMove), NORMALPRIO, ThdMove, NULL); //NORMALPRIO + 2
 }
 
 //-------------------------------------------------------------------------------------
