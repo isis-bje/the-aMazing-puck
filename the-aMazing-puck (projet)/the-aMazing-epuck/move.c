@@ -38,7 +38,6 @@ static THD_FUNCTION(ThdMove, arg)
 		node_type = junction_detection(path);
 		print_measures(path);
 
-		wait_receive_order();
 		move_command(node_type);
 
 		chThdSleepMilliseconds(100*SLEEP_TIME);

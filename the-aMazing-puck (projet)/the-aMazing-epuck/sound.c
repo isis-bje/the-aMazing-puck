@@ -17,7 +17,7 @@
 // STATIC VARIABLES AND ARRAYS
 
 //semaphore
-static BSEMAPHORE_DECL(receive_order_sem, TRUE);
+static BSEMAPHORE_DECL(sendToComputer_sem, TRUE);
 
 //2 times FFT_SIZE because these arrays contain complex numbers (real + imaginary)
 static float micLeft_cmplx_input[2 * FFT_SIZE];
@@ -33,7 +33,6 @@ static float micBack_output[FFT_SIZE];
 
 //--------------------------------------------------------------------------------------------------
 
-#define FFT_SIZE 	1024
 
 #define MIN_VALUE_THRESHOLD	10000
 
@@ -128,23 +127,21 @@ void processSound(int16_t *data, uint16_t num_samples){
 		// TO BE MODIFIED :
 		//sends only one FFT result over 10 for 1 mic to not flood the computer
 		//sends to UART3
-		//if(mustSend > 8){
+		if(mustSend > 8){
 			//signals to send the result to the computer
-			//chBSemSignal(&sendToComputer_sem);
-			//mustSend = 0;
-		//}
-		//nb_samples = 0;
-		//mustSend++;
-
-		chBSemSignal(&receive_order_sem);
+			chBSemSignal(&sendToComputer_sem);
+			mustSend = 0;
+		}
+		nb_samples = 0;
+		mustSend++;
 
 		sound_remote(micLeft_output);
 	}
 }
 
-void wait_receive_order(void){
+void wait_send_to_computer(void){
 
-	chBSemWait(&receive_order_sem);
+	chBSemWait(&sendToComputer_sem);
 }
 
 /*
