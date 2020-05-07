@@ -57,9 +57,14 @@ void sound_remote(float* data);
 
 //---------------------------------------------------------------------------------------------
 
-uint8_t wait_receive_order(void){
+uint8_t wait_receive_order(uint8_t node_type){
 
-	chBSemWait(&get_order_sem);
+	do{  //redemande un ordre sonore tant qu'il n'est pas faisable
+		chBSemWait(&get_order_sem);
+	}while((node_type == T_JUNCTION_LEFT && command == TURN_RIGHT) ||
+		   (node_type == T_JUNCTION_RIGHT && command == TURN_LEFT) ||
+		   (node_type == T_JUNCTION && command == GO_FORWARD));
+
 	return command;
 }
 

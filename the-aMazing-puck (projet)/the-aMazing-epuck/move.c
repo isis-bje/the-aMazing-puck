@@ -20,6 +20,7 @@ void turn_left_90(void);
 void go_forward_regulator(void);
 void go_forward(void);
 void half_turn(void);
+void execute_command(uint8_t command);
 
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]);
 void measure_dist(int32_t dist[NB_CAPTEURS]);
@@ -175,7 +176,7 @@ void move_command(uint8_t node_type){
 				}
 				stop();
 				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un crossroad et j'attends le son \r\n");
-				command = wait_receive_order();
+				command = wait_receive_order(node_type);
 				break;
 
 			case T_JUNCTION_LEFT :
@@ -184,7 +185,7 @@ void move_command(uint8_t node_type){
 				}
 				stop();
 				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un TLeft et j'attends le son \r\n");
-				command = wait_receive_order();
+				command = wait_receive_order(node_type);
 				break;
 
 			case T_JUNCTION_RIGHT :
@@ -193,20 +194,22 @@ void move_command(uint8_t node_type){
 				}
 				stop();
 				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un TRight et j'attends le son \r\n");
-				command = wait_receive_order();
+				command = wait_receive_order(node_type);
 				break;
 
 			case T_JUNCTION :
 				while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
 					go_forward();
 				}
+				stop();
 				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un T et j'attends le son \r\n");
-				command = wait_receive_order();
+				command = wait_receive_order(node_type);
 				break;
 
 			default :
 				break;
 		}
+		execute_command(command);
 	}
 
 	switch(node_type)
@@ -412,4 +415,33 @@ void half_turn(){
 	}
 	set_led(LED5, OFF);
 	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
+}
+
+void execute_command(uint8_t command){
+	switch(command)
+	{
+		case STOP :
+			stop();
+			break;
+		case GO_FORWARD :
+			do{  //avance jusqu'à sortir de la jonction
+				go_forward();
+			}while(get_prox(SIDE_LEFT) < THRESHOLD_WALL || get_prox(SIDE_RIGHT) < THRESHOLD_WALL);
+			stop();
+			break;
+		case TURN_LEFT :
+			turn_left_90();
+			do{  //avance jusqu'à sortir de la jonction
+				go_forward();
+			}while(get_prox(SIDE_LEFT) < THRESHOLD_WALL);
+			stop();
+			break;
+		case TURN_RIGHT :
+			turn_right_90();
+			do{  //avance jusqu'à sortir de la jonction
+				go_forward();
+			}while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL);
+			stop();
+			break;
+	}
 }
