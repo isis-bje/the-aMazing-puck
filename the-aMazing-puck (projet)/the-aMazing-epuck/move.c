@@ -9,21 +9,28 @@
 #include <leds.h>
 #include <sound.h>
 
+static uint8_t program;
+
 uint8_t junction_detection(int32_t find_path[NB_CAPTEURS]);
+void move_command(uint8_t node_type);
+
+void stop(void);
+void turn_right_90(void);
+void turn_left_90(void);
+void go_forward_regulator(void);
+void go_forward(void);
+void half_turn(void);
+
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]);
 void measure_dist(int32_t dist[NB_CAPTEURS]);
-
 void print_calibrated_measures(int32_t path_cal[NB_CAPTEURS]);
 void print_measures(int32_t path[NB_CAPTEURS]);
-
 int8_t steps_to_cm(int16_t nb_steps);
 int16_t cm_to_steps(int8_t dist_cm);
-void move_command(uint8_t node_type/*, bool state*/);
-
 
 //Thread that controls the movement of the robot
 
-static THD_WORKING_AREA(waThdMove, 512);
+static THD_WORKING_AREA(waThdMove, 4096);
 static THD_FUNCTION(ThdMove, arg)
 {
     chRegSetThreadName(__FUNCTION__);
@@ -36,30 +43,28 @@ static THD_FUNCTION(ThdMove, arg)
 	while(1){
 
 		node_type = junction_detection(path);
-		print_measures(path);
+		//print_measures(path);
 
 		move_command(node_type);
 
-		chThdSleepMilliseconds(100*SLEEP_TIME);
+		chThdSleepMilliseconds(SLEEP_TIME);
 	}
 
 }
 
-//-------------------------------------------------------------------------------------
+//-------------------------EXTERNAL FUNCTIONS-------------------------------------------
 
-// EXTERNAL FUNCTIONS
-
-void move_start(void){
+void move_start(uint8_t mode){
 
 	right_motor_set_speed(0);
 	left_motor_set_speed(0);
 
+	program = mode;
+
 	chThdCreateStatic(waThdMove, sizeof(waThdMove), NORMALPRIO, ThdMove, NULL); //NORMALPRIO + 2
 }
 
-//-------------------------------------------------------------------------------------
-
-// INTERNAL FUNCTIONS
+//-------------------------INTERNAL FUNCTIONS--------------------------------------------
 
 //algorithme de detection du type de jonction
 uint8_t junction_detection(int32_t find_path[]){
@@ -112,10 +117,11 @@ uint8_t junction_detection(int32_t find_path[]){
 	return node_type;
 }
 
-void move_command(uint8_t node_type/*, bool state*/){
+// a completer avec les modifs de Julien
+void move_command(uint8_t node_type){
 
-	/*if(state) //automatic mode
-	{*/
+	if(program == AUTO) //automatic mode
+	{
 		switch(node_type)
 		{
 			case CROSSROAD :
@@ -155,31 +161,38 @@ void move_command(uint8_t node_type/*, bool state*/){
 			default :
 				break;
 		}
-	/*}
-	else //semi-automatic mode
+	}
+	else if(program == SEMIAUTO)//semi-automatic mode
 	{
+		uint8_t command = 0;
+
 		switch(node_type)
 		{
+
 			case CROSSROAD :
-				get_sound_order();
+				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un crossroad et j'attends le son \r\n");
+				command = wait_receive_order();
 				break;
 
 			case T_JUNCTION_LEFT :
-				get_sound_order();
+				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un TLeft et j'attends le son \r\n");
+				command = wait_receive_order();
 				break;
 
 			case T_JUNCTION_RIGHT :
-				get_sound_order();
+				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un TRight et j'attends le son \r\n");
+				command = wait_receive_order();
 				break;
 
 			case T_JUNCTION :
-				get_sound_order();
+				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un T et j'attends le son \r\n");
+				command = wait_receive_order();
 				break;
 
 			default :
 				break;
 		}
-	}*/
+	}
 
 	switch(node_type)
 	{
@@ -227,12 +240,14 @@ void print_calibrated_measures(int32_t path_cal[]){
 
 	measure_dist_cal(path_cal);
 
-	chprintf((BaseSequentialStream *) &SD3, "Capteur front left calibrated: %d \n", path_cal[FRONT_LEFT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur front right calibrated: %d \n", path_cal[FRONT_RIGHT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur front side left calibrated: %d \n", path_cal[FRONT_SIDE_LEFT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur front side right calibrated: %d \n", path_cal[FRONT_SIDE_RIGHT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur side left calibrated: %d \n", path_cal[SIDE_LEFT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur side right calibrated: %d \n", path_cal[SIDE_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front left calibrated: %d \r\n", path_cal[FRONT_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front right calibrated: %d \r\n", path_cal[FRONT_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front side left calibrated: %d \r\n", path_cal[FRONT_SIDE_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur front side right calibrated: %d \r\n", path_cal[FRONT_SIDE_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur side left calibrated: %d \r\n", path_cal[SIDE_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur side right calibrated: %d \r\n", path_cal[SIDE_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur back left calibrated: %d \r\n", path_cal[BACK_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur back right calibrated: %d \r\n", path_cal[BACK_RIGHT]);
 
 }
 
@@ -244,6 +259,8 @@ void print_measures(int32_t path[]){
 	chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \r\n", path[FRONT_SIDE_RIGHT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \r\n", path[SIDE_LEFT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \r\n", path[SIDE_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur back left: %d \n", path[BACK_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur back right: %d \n", path[BACK_RIGHT]);
 }
 
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]){
@@ -254,6 +271,8 @@ void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]){
 	dist_cal[FRONT_SIDE_LEFT] = get_calibrated_prox(FRONT_SIDE_LEFT);
 	dist_cal[SIDE_RIGHT] = get_calibrated_prox(SIDE_RIGHT);
 	dist_cal[SIDE_LEFT] = get_calibrated_prox(SIDE_LEFT);
+	dist_cal[BACK_RIGHT] = get_calibrated_prox(BACK_RIGHT);
+	dist_cal[BACK_LEFT] = get_calibrated_prox(BACK_LEFT);
 }
 
 void measure_dist(int32_t dist[NB_CAPTEURS]){
@@ -264,6 +283,8 @@ void measure_dist(int32_t dist[NB_CAPTEURS]){
 	dist[FRONT_SIDE_LEFT] = get_prox(FRONT_SIDE_LEFT);
 	dist[SIDE_RIGHT] = get_prox(SIDE_RIGHT);
 	dist[SIDE_LEFT] = get_prox(SIDE_LEFT);
+	dist[BACK_RIGHT] = get_prox(BACK_RIGHT);
+	dist[BACK_LEFT] = get_prox(BACK_LEFT);
 }
 
 int8_t steps_to_cm(int16_t nb_steps){ // from -100 - 100 cm to -32000 - 32000 steps

@@ -10,8 +10,6 @@
 #include <string.h>
 #include <math.h>
 
-#include <arm_math.h> //?
-
 #include "ch.h"
 #include "hal.h"
 #include "memory_protection.h"
@@ -26,7 +24,6 @@
 #include <main.h>
 #include <move.h>
 #include <sound.h>
-#include <communications.h>
 
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
@@ -48,9 +45,6 @@ static void serial_start(void){
 
 int main(void){
 
-	//static uint8_t mode;
-	//static uint8_t pause;
-
 	halInit();
     chSysInit();
     mpu_init();
@@ -71,49 +65,39 @@ int main(void){
     motors_init();
 
     //start the microphone
-    //it calls the callback given in parameter when samples are ready
-    mic_start(&processSound);
+    mic_start(&processSound); //processSound is a callback function used when samples are ready
 
-	//starts the threads that controls the movement of the robot
-	//move_start();
-
-	//LAUNCH MODE : SOUTH -> AUTOMATIC MODE (4)
+	//LAUNCH MODE : OTHER -> The epuck is still until a mode is selected
+    //				SOUTH -> AUTOMATIC MODE (4)
 	//				NORTH -> SEMI-AUTOMATIC MODE (12)
-	//			    WEST  -> PAUSE MODE (SLEEP) (8)
-	// 				EAST  -> STOP MODE (REINITIALIZE) (0)
 
-	/* starts the threads that controls the movement of the robot
-	move_start(); doit recuperer le mode */
-	//chprintf((BaseSequentialStream *) &SD3, "mode = %d\r\n", mode);
+    static uint8_t mode = 0;
 
-	/*mode = get_selector();
-	/if(mode == 4){
-		chprintf((BaseSequentialStream *) &SD3, "AUTOMATIC\r\n");
-	}
-	else if (mode == 12){
-		chprintf((BaseSequentialStream *) &SD3, "SEMI-AUTO\r\n");;
-	}
-	else
-		return 0;*/
+    while (mode != AUTO && mode != SEMIAUTO){
+
+    	mode = get_selector();
+    	chThdSleepMilliseconds(1000);
+
+    }
+
+    if(mode == AUTO){
+    	chprintf((BaseSequentialStream *) &SD3, "AUTOMATIC\r\n");
+    }
+    else if (mode == SEMIAUTO){
+		chprintf((BaseSequentialStream *) &SD3, "SEMI-AUTO\r\n");
+    }
+
+    //starts the threads that controls the movement of the robot
+    move_start(mode);
 
     /* Infinite loop. */
     while (1){
 
-    	/*pause = get_selector();
-    	if(pause == 8){
-    		chprintf((BaseSequentialStream *) &SD3, "PAUSE\r\n");
-    		//pause_function, arret des moteurs, allumage de LEDS
-    	}
-    	else {
-    		chprintf((BaseSequentialStream *) &SD3, "WORKING\r\n");
-    	}*/
+    	//waits 1 second
+    	chThdSleepMilliseconds(1000);
 
-    	//waits until a result must be sent to the computer
-    	wait_send_to_computer();
+    	chprintf((BaseSequentialStream *) &SD3, "Sleep\r\n"); //to be removed
 
-    	SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(LEFT_OUTPUT), FFT_SIZE);
-
-    	chThdSleepMilliseconds(1000); //waits 1 second
     }
 }
 
