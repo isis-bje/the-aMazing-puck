@@ -125,11 +125,11 @@ void move_command(uint8_t node_type){
 		switch(node_type)
 		{
 			case CROSSROAD :
-				while(get_prox(FRONT_SIDE_LEFT) < THRESHOLD_WALL && get_prox(FRONT_SIDE_RIGHT) < THRESHOLD_WALL){ //tant que l'e-puck n'est pas entré dans le croisement
+				while(get_prox(BACK_LEFT) > THRESHOLD_BACK && get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
 					go_forward();
 				}
 				turn_right_90();
-				while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+				while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 					go_forward();
 				}
 				break;
@@ -139,11 +139,11 @@ void move_command(uint8_t node_type){
 				break;
 
 			case T_JUNCTION_RIGHT :
-				while(get_prox(FRONT_SIDE_LEFT) < THRESHOLD_WALL && get_prox(FRONT_SIDE_RIGHT) < THRESHOLD_WALL){ //tant que l'e-puck n'est pas entré dans le croisement
+				while(get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
 					go_forward();
 				}
 				turn_right_90();
-				while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+				while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 					go_forward();
 				}
 				break;
@@ -170,21 +170,36 @@ void move_command(uint8_t node_type){
 		{
 
 			case CROSSROAD :
+				while(get_prox(BACK_LEFT) > THRESHOLD_BACK && get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
+					go_forward();
+				}
+				stop();
 				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un crossroad et j'attends le son \r\n");
 				command = wait_receive_order();
 				break;
 
 			case T_JUNCTION_LEFT :
+				while(get_prox(BACK_LEFT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
+					go_forward();
+				}
+				stop();
 				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un TLeft et j'attends le son \r\n");
 				command = wait_receive_order();
 				break;
 
 			case T_JUNCTION_RIGHT :
+				while(get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
+					go_forward();
+				}
+				stop();
 				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un TRight et j'attends le son \r\n");
 				command = wait_receive_order();
 				break;
 
 			case T_JUNCTION :
+				while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
+					go_forward();
+				}
 				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un T et j'attends le son \r\n");
 				command = wait_receive_order();
 				break;
