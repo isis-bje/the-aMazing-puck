@@ -76,47 +76,62 @@ uint8_t junction_detection(int32_t find_path[]){
 
 	uint8_t node_type = 0;
 
-	measure_dist(find_path);
+	measure_dist(find_path);   																				// fill an array with proximity sensors values
 
-	if(find_path[FRONT_LEFT] < THRESHOLD_JUNCTION && find_path[FRONT_RIGHT] < THRESHOLD_JUNCTION) //si passage devant ouvert
+	if(find_path[SIDE_LEFT] > THRESHOLD_WALL && find_path[SIDE_RIGHT] > THRESHOLD_WALL)						// if no opening neither left nor right
 	{
-		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage à gauche et à droite
-		{
-			node_type = CROSSROAD;
-		}
-		else if(find_path[SIDE_LEFT] < THRESHOLD_WALL) //si passage à gauche
-		{
-			node_type = T_JUNCTION_LEFT;
-		}
-		else if(find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage à droite
-		{
-			node_type = T_JUNCTION_RIGHT;
-		}
-		else //passage uniquement tout droit
+		if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT) 			// if opening forward
 		{
 			node_type = STRAIGHT_PATH;
 		}
-	}
-	else //si pas de passage devant
-	{
-		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage ï¿½ gauche et ï¿½ droite
-		{
-			node_type = T_JUNCTION;
-		}
-		else if(find_path[SIDE_LEFT] < THRESHOLD_WALL) //si passage ï¿½ gauche
-		{
-			node_type = CORNER_LEFT;
-		}
-		else if(find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage ï¿½ droite
-		{
-			node_type = CORNER_RIGHT;
-		}
-		else //aucun passage
+		else																								// if no opening forward
 		{
 			node_type = CUL_DE_SAC;
 		}
 	}
-
+	else if(find_path[SIDE_LEFT] < THRESHOLD_WALL || find_path[SIDE_RIGHT] < THRESHOLD_WALL)  				// if opening left or right
+	{
+		left_motor_set_pos(0);
+		right_motor_set_pos(0);
+		do{
+			go_forward();
+		}while((left_motor_get_pos() < MIDDLE && right_motor_get_pos() < MIDDLE) || 						// go to the middle of the junction
+			   (find_path[FRONT_LEFT] > THRESHOLD_FRONT && find_path[FRONT_RIGHT] > THRESHOLD_FRONT));  	// if too close to a wall
+		stop();
+		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) 				// if opening left and right
+		{
+			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT) 		// if opening forward
+			{
+				node_type = CROSSROAD;
+			}
+			else																							// if no opening forward
+			{
+				node_type = T_JUNCTION;
+			}
+		}
+		else if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] > THRESHOLD_WALL) 			// if opening only left
+		{
+			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT) 		// if opening forward
+			{
+				node_type = T_JUNCTION_LEFT;
+			}
+			else																							// if no opening forward
+			{
+				node_type = CORNER_LEFT;
+			}
+		}
+		else if(find_path[SIDE_LEFT] > THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) 			// if opening only right
+		{
+			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT) 		// if opening forward
+			{
+				node_type = T_JUNCTION_RIGHT;
+			}
+			else																							// if no opening forawrd
+			{
+				node_type = CORNER_RIGHT;
+			}
+		}
+	}
 	chprintf((BaseSequentialStream *) &SD3, "node_type: %d\r\n", node_type);
 
 	return node_type;
@@ -337,9 +352,6 @@ void automatic_command(uint8_t node_type){
 	switch(node_type){
 
 		case CROSSROAD :
-			while(get_prox(BACK_LEFT) > THRESHOLD_BACK && get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
 			turn_right_90();
 			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
@@ -351,9 +363,6 @@ void automatic_command(uint8_t node_type){
 			break;
 
 		case T_JUNCTION_RIGHT :
-			while(get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
 			turn_right_90();
 			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
@@ -361,9 +370,6 @@ void automatic_command(uint8_t node_type){
 			break;
 
 		case T_JUNCTION :
-			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
 			turn_right_90();
 			while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
@@ -384,35 +390,51 @@ void semiautomatic_command(uint8_t node_type){
 	switch(node_type){
 
 		case CROSSROAD :
-			while(get_prox(BACK_LEFT) > THRESHOLD_BACK && get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
-			stop();
+			set_led(LED1, ON);
+			set_led(LED3, ON);
+			set_led(LED5, ON);
+			set_led(LED7, ON);
 			command = wait_receive_order(node_type);
+			set_led(LED1, OFF);
+			set_led(LED3, OFF);
+			set_led(LED5, OFF);
+			set_led(LED7, OFF);
 			break;
 
 		case T_JUNCTION_LEFT :
-			while(get_prox(BACK_LEFT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
-			stop();
+			set_led(LED1, ON);
+			set_led(LED3, ON);
+			set_led(LED5, ON);
+			set_led(LED7, ON);
 			command = wait_receive_order(node_type);
+			set_led(LED1, OFF);
+			set_led(LED3, OFF);
+			set_led(LED5, OFF);
+			set_led(LED7, OFF);
 			break;
 
 		case T_JUNCTION_RIGHT :
-			while(get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
-			stop();
+			set_led(LED1, ON);
+			set_led(LED3, ON);
+			set_led(LED5, ON);
+			set_led(LED7, ON);
 			command = wait_receive_order(node_type);
+			set_led(LED1, OFF);
+			set_led(LED3, OFF);
+			set_led(LED5, OFF);
+			set_led(LED7, OFF);
 			break;
 
 		case T_JUNCTION :
-			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
-			stop();
+			set_led(LED1, ON);
+			set_led(LED3, ON);
+			set_led(LED5, ON);
+			set_led(LED7, ON);
 			command = wait_receive_order(node_type);
+			set_led(LED1, OFF);
+			set_led(LED3, OFF);
+			set_led(LED5, OFF);
+			set_led(LED7, OFF);
 			break;
 
 		default :
@@ -438,9 +460,6 @@ void general_command(uint8_t node_type){
 			break;
 
 		case CORNER_LEFT :
-			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
 			turn_left_90();
 			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
@@ -448,9 +467,6 @@ void general_command(uint8_t node_type){
 			break;
 
 		case CORNER_RIGHT :
-			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
 			turn_right_90();
 			while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
