@@ -4,6 +4,7 @@
 #include "hal.h"
 #include <chprintf.h>
 #include <usbcfg.h>
+
 #include <sensors/proximity.h>
 #include <motors.h>
 #include <leds.h>
@@ -14,13 +15,17 @@ static uint8_t program;
 uint8_t junction_detection(int32_t find_path[NB_CAPTEURS]);
 void move_command(uint8_t node_type);
 
+void execute_sound_command(uint8_t command);
+void automatic_command(uint8_t node_type);
+void semiautomatic_command(uint8_t node_type);
+void general_command(uint8_t node_type);
+
 void stop(void);
 void turn_right_90(void);
 void turn_left_90(void);
 void go_forward_regulator(void);
 void go_forward(void);
 void half_turn(void);
-void execute_command(uint8_t command);
 
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]);
 void measure_dist(int32_t dist[NB_CAPTEURS]);
@@ -31,7 +36,7 @@ int16_t cm_to_steps(int8_t dist_cm);
 
 //Thread that controls the movement of the robot
 
-static THD_WORKING_AREA(waThdMove, 4096);
+static THD_WORKING_AREA(waThdMove, 512);
 static THD_FUNCTION(ThdMove, arg)
 {
     chRegSetThreadName(__FUNCTION__);
@@ -39,7 +44,6 @@ static THD_FUNCTION(ThdMove, arg)
 
     uint8_t node_type = 0;
 	int32_t path[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};
-	/*int32_t path_cal[NB_CAPTEURS] = {0, 0, 0, 0, 0, 0, 0, 0};*/
 
 	while(1){
 
@@ -62,12 +66,12 @@ void move_start(uint8_t mode){
 
 	program = mode;
 
-	chThdCreateStatic(waThdMove, sizeof(waThdMove), NORMALPRIO, ThdMove, NULL); //NORMALPRIO + 2
+	chThdCreateStatic(waThdMove, sizeof(waThdMove), NORMALPRIO, ThdMove, NULL); //NORMALPRIO + 2 ?
 }
 
 //-------------------------INTERNAL FUNCTIONS--------------------------------------------
 
-//algorithme de detection du type de jonction
+//Detection of a junction
 uint8_t junction_detection(int32_t find_path[]){
 
 	uint8_t node_type = 0;
@@ -118,141 +122,17 @@ uint8_t junction_detection(int32_t find_path[]){
 	return node_type;
 }
 
-// a completer avec les modifs de Julien
 void move_command(uint8_t node_type){
 
-	if(program == AUTO) //automatic mode
-	{
-		switch(node_type)
-		{
-			case CROSSROAD :
-				while(get_prox(BACK_LEFT) > THRESHOLD_BACK && get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-					go_forward();
-				}
-				turn_right_90();
-				while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
-					go_forward();
-				}
-				break;
+	if(program == AUTO){ //automatic mode
 
-			case T_JUNCTION_LEFT :
-				go_forward();
-				break;
-
-			case T_JUNCTION_RIGHT :
-				while(get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-					go_forward();
-				}
-				turn_right_90();
-				while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
-					go_forward();
-				}
-				break;
-
-			case T_JUNCTION :
-				while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
-					go_forward();
-				}
-				turn_right_90();
-				while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
-					go_forward();
-				}
-				break;
-
-			default :
-				break;
-		}
+		automatic_command(node_type);
 	}
-	else if(program == SEMIAUTO)//semi-automatic mode
-	{
-		uint8_t command = 0;
+	else if(program == SEMIAUTO){//semi-automatic mode
 
-		switch(node_type)
-		{
-
-			case CROSSROAD :
-				while(get_prox(BACK_LEFT) > THRESHOLD_BACK && get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-					go_forward();
-				}
-				stop();
-				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un crossroad et j'attends le son \r\n");
-				command = wait_receive_order(node_type);
-				break;
-
-			case T_JUNCTION_LEFT :
-				while(get_prox(BACK_LEFT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-					go_forward();
-				}
-				stop();
-				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un TLeft et j'attends le son \r\n");
-				command = wait_receive_order(node_type);
-				break;
-
-			case T_JUNCTION_RIGHT :
-				while(get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
-					go_forward();
-				}
-				stop();
-				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un TRight et j'attends le son \r\n");
-				command = wait_receive_order(node_type);
-				break;
-
-			case T_JUNCTION :
-				while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
-					go_forward();
-				}
-				stop();
-				chprintf((BaseSequentialStream *) &SD3, "Je suis dans un T et j'attends le son \r\n");
-				command = wait_receive_order(node_type);
-				break;
-
-			default :
-				break;
-		}
-		execute_command(command);
-	}
-
-	switch(node_type)
-	{
-		case NODE_ERROR :
-			stop();
-			chprintf((BaseSequentialStream *) &SD3, "error");
-			break;
-
-		case STRAIGHT_PATH :
-			go_forward_regulator();
-			break;
-
-		case CORNER_LEFT :
-			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
-			turn_left_90();
-			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
-				go_forward();
-			}
-			break;
-
-		case CORNER_RIGHT :
-			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
-				go_forward();
-			}
-			turn_right_90();
-			while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
-				go_forward();
-			}
-			break;
-
-		case CUL_DE_SAC :
-			half_turn();
-			go_forward();
-			break;
-
-		default :
-			break;
+		semiautomatic_command(node_type);
 	}
 }
-
 
 void print_calibrated_measures(int32_t path_cal[]){
 
@@ -315,8 +195,7 @@ int16_t cm_to_steps(int8_t dist_cm){ // from -100 - 100 cm to -32000 - 32000 ste
 	return dist_cm*NBSTEPS_ONE_TURN/WHEEL_PERIMETER;
 }
 
-void stop(){
-
+void stop(void){
 
 	set_led(LED1, ON);
 	set_led(LED3, ON);
@@ -335,7 +214,7 @@ void stop(){
 
 }
 
-void turn_right_90(){
+void turn_right_90(void){
 
 	set_led(LED3, ON);
 
@@ -350,11 +229,10 @@ void turn_right_90(){
 		left_motor_pos = left_motor_get_pos();
 	}
 	set_led(LED3, OFF);
-	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
+	stop();
 }
 
-
-void turn_left_90(){
+void turn_left_90(void){
 
 	set_led(LED7, ON);
 
@@ -370,35 +248,28 @@ void turn_left_90(){
 
 	}
 	set_led(LED7, OFF);
-	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
+	stop();
 }
 
-void go_forward_regulator(){ //fonction de déplacement en ligne droite avec régulateur proportionnel
+void go_forward_regulator(void){ //fonction de déplacement en ligne droite avec régulateur proportionnel
 
-	int32_t error = get_prox(SIDE_RIGHT) - get_prox(SIDE_LEFT);
+	int32_t error_kp = get_prox(SIDE_RIGHT) - get_prox(SIDE_LEFT);
 	set_led(LED1, ON);
-	if(error > 0){
 
-		left_motor_set_speed(500 - error*KP);
-		right_motor_set_speed(500 + error*KP);
-	}
+		left_motor_set_speed(500 - error_kp*KP);
+		right_motor_set_speed(500 + error_kp*KP);
 
-	else{
-
-		left_motor_set_speed(500 + error*KP);
-		right_motor_set_speed(500 - error*KP);
-	}
-	set_led(LED3, OFF);
+	set_led(LED1, OFF);
 }
 
-void go_forward(){ //déplacement en ligne droite sans régulateur afin de sortir des jonctions
+void go_forward(void){ //déplacement en ligne droite sans régulateur afin de sortir des jonctions
 	set_led(LED1, ON);
 	left_motor_set_speed(500);
 	right_motor_set_speed(500);
-	set_led(LED3, OFF);
+	set_led(LED1, OFF);
 }
 
-void half_turn(){
+void half_turn(void){
 
 	set_led(LED5, ON);
 
@@ -414,21 +285,24 @@ void half_turn(){
 
 	}
 	set_led(LED5, OFF);
-	stop(); // on pourrait remplacer par /*go_forward();*/ puis le faire avancer par détection
+	stop();
 }
 
-void execute_command(uint8_t command){
-	switch(command)
-	{
+void execute_sound_command(uint8_t command){
+
+	switch(command){
+
 		case STOP :
 			stop();
 			break;
+
 		case GO_FORWARD :
 			do{  //avance jusqu'à sortir de la jonction
 				go_forward();
 			}while(get_prox(SIDE_LEFT) < THRESHOLD_WALL || get_prox(SIDE_RIGHT) < THRESHOLD_WALL);
 			stop();
 			break;
+
 		case TURN_LEFT :
 			turn_left_90();
 			do{  //avance jusqu'à sortir de la jonction
@@ -436,6 +310,7 @@ void execute_command(uint8_t command){
 			}while(get_prox(SIDE_LEFT) < THRESHOLD_WALL);
 			stop();
 			break;
+
 		case TURN_RIGHT :
 			turn_right_90();
 			do{  //avance jusqu'à sortir de la jonction
@@ -443,5 +318,152 @@ void execute_command(uint8_t command){
 			}while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL);
 			stop();
 			break;
+
+		case HALF_TURN :
+			half_turn();
+			do{  //avance jusqu'à sortir de la jonction
+				go_forward();
+			}while(get_prox(SIDE_LEFT) < THRESHOLD_WALL || get_prox(SIDE_RIGHT) < THRESHOLD_WALL);
+			stop();
+			break;
 	}
 }
+
+void automatic_command(uint8_t node_type){
+
+	switch(node_type){
+
+		case CROSSROAD :
+			while(get_prox(BACK_LEFT) > THRESHOLD_BACK && get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
+			turn_right_90();
+			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+				go_forward();
+			}
+			break;
+
+		case T_JUNCTION_LEFT :
+			go_forward();
+			break;
+
+		case T_JUNCTION_RIGHT :
+			while(get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
+			turn_right_90();
+			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+				go_forward();
+			}
+			break;
+
+		case T_JUNCTION :
+			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
+			turn_right_90();
+			while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+				go_forward();
+			}
+			break;
+
+		default :
+			break;
+	}
+
+	general_command(node_type);
+}
+
+void semiautomatic_command(uint8_t node_type){
+
+	uint8_t command = 0;
+
+	switch(node_type){
+
+		case CROSSROAD :
+			while(get_prox(BACK_LEFT) > THRESHOLD_BACK && get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
+			stop();
+			command = wait_receive_order(node_type);
+			break;
+
+		case T_JUNCTION_LEFT :
+			while(get_prox(BACK_LEFT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
+			stop();
+			command = wait_receive_order(node_type);
+			break;
+
+		case T_JUNCTION_RIGHT :
+			while(get_prox(BACK_RIGHT) > THRESHOLD_BACK){ //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
+			stop();
+			command = wait_receive_order(node_type);
+			break;
+
+		case T_JUNCTION :
+			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
+			stop();
+			command = wait_receive_order(node_type);
+			break;
+
+		default :
+			break;
+	}
+
+	execute_sound_command(command);
+	general_command(node_type);
+
+}
+
+void general_command(uint8_t node_type){
+
+	switch(node_type){
+
+		case NODE_ERROR :
+			stop();
+			chprintf((BaseSequentialStream *) &SD3, "error");
+			break;
+
+		case STRAIGHT_PATH :
+			go_forward_regulator();
+			break;
+
+		case CORNER_LEFT :
+			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
+			turn_left_90();
+			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+				go_forward();
+			}
+			break;
+
+		case CORNER_RIGHT :
+			while(get_prox(FRONT_LEFT) < THRESHOLD_FRONT && get_prox(FRONT_RIGHT) < THRESHOLD_FRONT){  //tant que l'e-puck n'est pas entré dans le croisement
+				go_forward();
+			}
+			turn_right_90();
+			while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
+				go_forward();
+			}
+			break;
+
+		case CUL_DE_SAC :
+			half_turn();
+			go_forward();
+			break;
+
+		default :
+			break;
+	}
+}
+
+
+
+

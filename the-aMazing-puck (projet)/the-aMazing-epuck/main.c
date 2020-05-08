@@ -65,7 +65,7 @@ int main(void){
     motors_init();
 
     //start the microphone
-    mic_start(&processSound); //processSound is a callback function used when samples are ready
+    //mic_start(&processSound); //processSound is a callback function used when samples are ready
 
 	//LAUNCH MODE : OTHER -> The epuck is still until a mode is selected
     //				SOUTH -> AUTOMATIC MODE (4)
@@ -85,6 +85,7 @@ int main(void){
     }
     else if (mode == SEMIAUTO){
 		chprintf((BaseSequentialStream *) &SD3, "SEMI-AUTO\r\n");
+		mic_start(&processSound);
     }
 
     //starts the threads that controls the movement of the robot

@@ -34,12 +34,13 @@ static uint8_t command;
 
 #define MIN_VALUE_THRESHOLD	10000
 
-#define MIN_FREQ		10	//we don't analyze before this index to not use resources for nothing
+#define MIN_FREQ		10	//156Hz we don't analyze before this index to not use resources for nothing
 #define FREQ_FORWARD	16	//250Hz
 #define FREQ_LEFT		19	//296Hz
-#define FREQ_RIGHT		23	//359HZ
-#define FREQ_BACKWARD	26	//406Hz
-#define MAX_FREQ		30	//we don't analyze after this index to not use resources for nothing
+#define FREQ_RIGHT		23	//359Hz
+#define FREQ_HTURN   	26	//406Hz
+#define FREQ_STOP       30  //469Hz
+#define MAX_FREQ		35	//547Hz we don't analyze after this index to not use resources for nothing
 
 #define FREQ_FORWARD_L		(FREQ_FORWARD-1)
 #define FREQ_FORWARD_H		(FREQ_FORWARD+1)
@@ -47,8 +48,10 @@ static uint8_t command;
 #define FREQ_LEFT_H			(FREQ_LEFT+1)
 #define FREQ_RIGHT_L		(FREQ_RIGHT-1)
 #define FREQ_RIGHT_H		(FREQ_RIGHT+1)
-#define FREQ_BACKWARD_L		(FREQ_BACKWARD-1)
-#define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
+#define FREQ_HTURN_L		(FREQ_HTURN-1)
+#define FREQ_HTURN_H		(FREQ_HTURN+1)
+#define FREQ_STOP_L			(FREQ_STOP-1)
+#define FREQ_STOP_H			(FREQ_STOP+1)
 
 //------------------------INTERNAL FUNCTIONS---------------------------------------------------
 
@@ -59,11 +62,14 @@ void sound_remote(float* data);
 
 uint8_t wait_receive_order(uint8_t node_type){
 
-	do{  //redemande un ordre sonore tant qu'il n'est pas faisable
+	//redemande un ordre sonore tant qu'il n'est pas faisable
+	do{
 		chBSemWait(&get_order_sem);
-	}while((node_type == T_JUNCTION_LEFT && command == TURN_RIGHT) ||
-		   (node_type == T_JUNCTION_RIGHT && command == TURN_LEFT) ||
-		   (node_type == T_JUNCTION && command == GO_FORWARD));
+	}
+	while((node_type == T_JUNCTION_LEFT && command == TURN_RIGHT) ||
+		  (node_type == T_JUNCTION_RIGHT && command == TURN_LEFT) ||
+		  (node_type == T_JUNCTION && command == GO_FORWARD) ||
+		  (command == RETRY));
 
 	return command;
 }
@@ -97,12 +103,17 @@ void sound_remote(float* data){
 	else if(max_norm_index >= FREQ_RIGHT_L && max_norm_index <= FREQ_RIGHT_H){
 		command = TURN_RIGHT;
 	}
-	//go backward
-	else if(max_norm_index >= FREQ_BACKWARD_L && max_norm_index <= FREQ_BACKWARD_H){
+	//turn around
+	else if(max_norm_index >= FREQ_HTURN_L && max_norm_index <= FREQ_HTURN_H){
 		command = HALF_TURN;
 	}
-	else{
+	//stop
+	else if(max_norm_index >= FREQ_STOP_L && max_norm_index <= FREQ_STOP_H){
 		command = STOP;
+	}
+	//no command received
+	else{
+		command = RETRY;
 	}
 
 	chBSemSignal(&get_order_sem);
@@ -174,7 +185,6 @@ void processSound(int16_t *data, uint16_t num_samples){
 		nb_samples = 0;
 
 		sound_remote(micLeft_output);
-
 	}
 }
 
