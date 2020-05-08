@@ -253,7 +253,7 @@ void turn_left_90(void){
 
 void go_forward_regulator(void){ //fonction de déplacement en ligne droite avec régulateur proportionnel
 
-	int32_t error_kp = get_prox(SIDE_RIGHT) - get_prox(SIDE_LEFT);
+	int32_t error_kp = get_prox(SIDE_RIGHT) + get_prox(FRONT_SIDE_RIGHT) - get_prox(SIDE_LEFT) - get_prox(FRONT_SIDE_LEFT);
 	set_led(LED1, ON);
 
 		left_motor_set_speed(500 - error_kp*KP);
