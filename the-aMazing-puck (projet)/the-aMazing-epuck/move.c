@@ -48,7 +48,7 @@ static THD_FUNCTION(ThdMove, arg)
 	while(1){
 
 		node_type = junction_detection(path);
-		//print_measures(path);
+		print_measures(path);
 
 		move_command(node_type);
 
@@ -78,7 +78,7 @@ uint8_t junction_detection(int32_t find_path[]){
 
 	measure_dist(find_path);
 
-	if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT) //si passage devant ouvert
+	if(find_path[FRONT_LEFT] < THRESHOLD_JUNCTION && find_path[FRONT_RIGHT] < THRESHOLD_JUNCTION) //si passage devant ouvert
 	{
 		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) //si passage à gauche et à droite
 		{
@@ -326,6 +326,9 @@ void execute_sound_command(uint8_t command){
 			}while(get_prox(SIDE_LEFT) < THRESHOLD_WALL || get_prox(SIDE_RIGHT) < THRESHOLD_WALL);
 			stop();
 			break;
+
+		default :
+			break;
 	}
 }
 
@@ -456,7 +459,6 @@ void general_command(uint8_t node_type){
 
 		case CUL_DE_SAC :
 			half_turn();
-			go_forward();
 			break;
 
 		default :

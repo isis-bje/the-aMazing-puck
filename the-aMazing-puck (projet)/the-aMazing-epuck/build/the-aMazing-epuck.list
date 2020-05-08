@@ -2877,22 +2877,22 @@ Disassembly of section .text:
  8002248:	08011fa0 	.word	0x08011fa0
  800224c:	00000000 	.word	0x00000000
 
-08002250 <chprintf.constprop.0>:
+08002250 <chprintf.constprop.1>:
  8002250:	b40e      	push	{r1, r2, r3}
  8002252:	b510      	push	{r4, lr}
  8002254:	b083      	sub	sp, #12
  8002256:	aa05      	add	r2, sp, #20
- 8002258:	4c09      	ldr	r4, [pc, #36]	; (8002280 <chprintf.constprop.0+0x30>)
+ 8002258:	4c09      	ldr	r4, [pc, #36]	; (8002280 <chprintf.constprop.1+0x30>)
  800225a:	f852 1b04 	ldr.w	r1, [r2], #4
  800225e:	6823      	ldr	r3, [r4, #0]
- 8002260:	4808      	ldr	r0, [pc, #32]	; (8002284 <chprintf.constprop.0+0x34>)
+ 8002260:	4808      	ldr	r0, [pc, #32]	; (8002284 <chprintf.constprop.1+0x34>)
  8002262:	9200      	str	r2, [sp, #0]
  8002264:	9301      	str	r3, [sp, #4]
  8002266:	f00a ff03 	bl	800d070 <chvprintf>
  800226a:	9a01      	ldr	r2, [sp, #4]
  800226c:	6823      	ldr	r3, [r4, #0]
  800226e:	429a      	cmp	r2, r3
- 8002270:	d104      	bne.n	800227c <chprintf.constprop.0+0x2c>
+ 8002270:	d104      	bne.n	800227c <chprintf.constprop.1+0x2c>
  8002272:	b003      	add	sp, #12
  8002274:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
  8002278:	b003      	add	sp, #12
@@ -2977,71 +2977,72 @@ Disassembly of section .text:
 
 08002340 <junction_detection>:
  8002340:	b530      	push	{r4, r5, lr}
- 8002342:	4d24      	ldr	r5, [pc, #144]	; (80023d4 <junction_detection+0x94>)
+ 8002342:	4d23      	ldr	r5, [pc, #140]	; (80023d0 <junction_detection+0x90>)
  8002344:	b083      	sub	sp, #12
  8002346:	4604      	mov	r4, r0
  8002348:	682b      	ldr	r3, [r5, #0]
  800234a:	9301      	str	r3, [sp, #4]
  800234c:	f7ff ffc8 	bl	80022e0 <measure_dist>
  8002350:	69e3      	ldr	r3, [r4, #28]
- 8002352:	f5b3 7ffa 	cmp.w	r3, #500	; 0x1f4
- 8002356:	da0e      	bge.n	8002376 <junction_detection+0x36>
- 8002358:	6821      	ldr	r1, [r4, #0]
- 800235a:	6962      	ldr	r2, [r4, #20]
- 800235c:	68a3      	ldr	r3, [r4, #8]
- 800235e:	f5b1 7ffa 	cmp.w	r1, #500	; 0x1f4
- 8002362:	da0a      	bge.n	800237a <junction_detection+0x3a>
- 8002364:	f5b2 7fe1 	cmp.w	r2, #450	; 0x1c2
- 8002368:	da23      	bge.n	80023b2 <junction_detection+0x72>
- 800236a:	f5b3 7fe1 	cmp.w	r3, #450	; 0x1c2
- 800236e:	db2c      	blt.n	80023ca <junction_detection+0x8a>
- 8002370:	2202      	movs	r2, #2
- 8002372:	4614      	mov	r4, r2
- 8002374:	e009      	b.n	800238a <junction_detection+0x4a>
- 8002376:	6962      	ldr	r2, [r4, #20]
- 8002378:	68a3      	ldr	r3, [r4, #8]
- 800237a:	f5b2 7fe1 	cmp.w	r2, #450	; 0x1c2
- 800237e:	db0f      	blt.n	80023a0 <junction_detection+0x60>
- 8002380:	f5b3 7fe1 	cmp.w	r3, #450	; 0x1c2
- 8002384:	da12      	bge.n	80023ac <junction_detection+0x6c>
- 8002386:	2207      	movs	r2, #7
- 8002388:	4614      	mov	r4, r2
- 800238a:	4913      	ldr	r1, [pc, #76]	; (80023d8 <junction_detection+0x98>)
- 800238c:	4813      	ldr	r0, [pc, #76]	; (80023dc <junction_detection+0x9c>)
- 800238e:	f7ff ff5f 	bl	8002250 <chprintf.constprop.0>
- 8002392:	9a01      	ldr	r2, [sp, #4]
- 8002394:	682b      	ldr	r3, [r5, #0]
- 8002396:	429a      	cmp	r2, r3
- 8002398:	4620      	mov	r0, r4
- 800239a:	d119      	bne.n	80023d0 <junction_detection+0x90>
- 800239c:	b003      	add	sp, #12
- 800239e:	bd30      	pop	{r4, r5, pc}
- 80023a0:	f5b3 7fe1 	cmp.w	r3, #450	; 0x1c2
- 80023a4:	db0b      	blt.n	80023be <junction_detection+0x7e>
- 80023a6:	2206      	movs	r2, #6
- 80023a8:	4614      	mov	r4, r2
- 80023aa:	e7ee      	b.n	800238a <junction_detection+0x4a>
- 80023ac:	2208      	movs	r2, #8
- 80023ae:	4614      	mov	r4, r2
- 80023b0:	e7eb      	b.n	800238a <junction_detection+0x4a>
- 80023b2:	f5b3 7fe1 	cmp.w	r3, #450	; 0x1c2
- 80023b6:	da05      	bge.n	80023c4 <junction_detection+0x84>
- 80023b8:	2203      	movs	r2, #3
- 80023ba:	4614      	mov	r4, r2
- 80023bc:	e7e5      	b.n	800238a <junction_detection+0x4a>
- 80023be:	2204      	movs	r2, #4
- 80023c0:	4614      	mov	r4, r2
- 80023c2:	e7e2      	b.n	800238a <junction_detection+0x4a>
- 80023c4:	2205      	movs	r2, #5
- 80023c6:	4614      	mov	r4, r2
- 80023c8:	e7df      	b.n	800238a <junction_detection+0x4a>
- 80023ca:	2201      	movs	r2, #1
- 80023cc:	4614      	mov	r4, r2
- 80023ce:	e7dc      	b.n	800238a <junction_detection+0x4a>
- 80023d0:	f7ff ff26 	bl	8002220 <__stack_chk_fail>
- 80023d4:	20000b00 	.word	0x20000b00
- 80023d8:	08012000 	.word	0x08012000
- 80023dc:	20010794 	.word	0x20010794
+ 8002352:	2bf9      	cmp	r3, #249	; 0xf9
+ 8002354:	dc0d      	bgt.n	8002372 <junction_detection+0x32>
+ 8002356:	6821      	ldr	r1, [r4, #0]
+ 8002358:	6962      	ldr	r2, [r4, #20]
+ 800235a:	68a3      	ldr	r3, [r4, #8]
+ 800235c:	29f9      	cmp	r1, #249	; 0xf9
+ 800235e:	dc0a      	bgt.n	8002376 <junction_detection+0x36>
+ 8002360:	f5b2 7fe1 	cmp.w	r2, #450	; 0x1c2
+ 8002364:	da23      	bge.n	80023ae <junction_detection+0x6e>
+ 8002366:	f5b3 7fe1 	cmp.w	r3, #450	; 0x1c2
+ 800236a:	db2c      	blt.n	80023c6 <junction_detection+0x86>
+ 800236c:	2202      	movs	r2, #2
+ 800236e:	4614      	mov	r4, r2
+ 8002370:	e009      	b.n	8002386 <junction_detection+0x46>
+ 8002372:	6962      	ldr	r2, [r4, #20]
+ 8002374:	68a3      	ldr	r3, [r4, #8]
+ 8002376:	f5b2 7fe1 	cmp.w	r2, #450	; 0x1c2
+ 800237a:	db0f      	blt.n	800239c <junction_detection+0x5c>
+ 800237c:	f5b3 7fe1 	cmp.w	r3, #450	; 0x1c2
+ 8002380:	da12      	bge.n	80023a8 <junction_detection+0x68>
+ 8002382:	2207      	movs	r2, #7
+ 8002384:	4614      	mov	r4, r2
+ 8002386:	4913      	ldr	r1, [pc, #76]	; (80023d4 <junction_detection+0x94>)
+ 8002388:	4813      	ldr	r0, [pc, #76]	; (80023d8 <junction_detection+0x98>)
+ 800238a:	f7ff ff61 	bl	8002250 <chprintf.constprop.1>
+ 800238e:	9a01      	ldr	r2, [sp, #4]
+ 8002390:	682b      	ldr	r3, [r5, #0]
+ 8002392:	429a      	cmp	r2, r3
+ 8002394:	4620      	mov	r0, r4
+ 8002396:	d119      	bne.n	80023cc <junction_detection+0x8c>
+ 8002398:	b003      	add	sp, #12
+ 800239a:	bd30      	pop	{r4, r5, pc}
+ 800239c:	f5b3 7fe1 	cmp.w	r3, #450	; 0x1c2
+ 80023a0:	db0b      	blt.n	80023ba <junction_detection+0x7a>
+ 80023a2:	2206      	movs	r2, #6
+ 80023a4:	4614      	mov	r4, r2
+ 80023a6:	e7ee      	b.n	8002386 <junction_detection+0x46>
+ 80023a8:	2208      	movs	r2, #8
+ 80023aa:	4614      	mov	r4, r2
+ 80023ac:	e7eb      	b.n	8002386 <junction_detection+0x46>
+ 80023ae:	f5b3 7fe1 	cmp.w	r3, #450	; 0x1c2
+ 80023b2:	da05      	bge.n	80023c0 <junction_detection+0x80>
+ 80023b4:	2203      	movs	r2, #3
+ 80023b6:	4614      	mov	r4, r2
+ 80023b8:	e7e5      	b.n	8002386 <junction_detection+0x46>
+ 80023ba:	2204      	movs	r2, #4
+ 80023bc:	4614      	mov	r4, r2
+ 80023be:	e7e2      	b.n	8002386 <junction_detection+0x46>
+ 80023c0:	2205      	movs	r2, #5
+ 80023c2:	4614      	mov	r4, r2
+ 80023c4:	e7df      	b.n	8002386 <junction_detection+0x46>
+ 80023c6:	2201      	movs	r2, #1
+ 80023c8:	4614      	mov	r4, r2
+ 80023ca:	e7dc      	b.n	8002386 <junction_detection+0x46>
+ 80023cc:	f7ff ff28 	bl	8002220 <__stack_chk_fail>
+ 80023d0:	20000b00 	.word	0x20000b00
+ 80023d4:	08012000 	.word	0x08012000
+ 80023d8:	20010794 	.word	0x20010794
+ 80023dc:	00000000 	.word	0x00000000
 
 080023e0 <stop>:
  80023e0:	b510      	push	{r4, lr}
@@ -3270,79 +3271,80 @@ Disassembly of section .text:
 
 08002660 <execute_sound_command>:
  8002660:	b510      	push	{r4, lr}
- 8002662:	4c28      	ldr	r4, [pc, #160]	; (8002704 <execute_sound_command+0xa4>)
+ 8002662:	4c29      	ldr	r4, [pc, #164]	; (8002708 <execute_sound_command+0xa8>)
  8002664:	b082      	sub	sp, #8
  8002666:	6823      	ldr	r3, [r4, #0]
  8002668:	9301      	str	r3, [sp, #4]
- 800266a:	2804      	cmp	r0, #4
- 800266c:	d842      	bhi.n	80026f4 <execute_sound_command+0x94>
- 800266e:	e8df f000 	tbb	[pc, r0]
- 8002672:	091c      	.short	0x091c
- 8002674:	3612      	.short	0x3612
- 8002676:	25          	.byte	0x25
- 8002677:	00          	.byte	0x00
- 8002678:	2002      	movs	r0, #2
- 800267a:	f001 ffc9 	bl	8004610 <get_prox>
- 800267e:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
- 8002682:	da12      	bge.n	80026aa <execute_sound_command+0x4a>
- 8002684:	f7ff ff9c 	bl	80025c0 <go_forward>
- 8002688:	2005      	movs	r0, #5
- 800268a:	f001 ffc1 	bl	8004610 <get_prox>
- 800268e:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
- 8002692:	dbf7      	blt.n	8002684 <execute_sound_command+0x24>
- 8002694:	e7f0      	b.n	8002678 <execute_sound_command+0x18>
- 8002696:	f7ff ff13 	bl	80024c0 <turn_left_90>
- 800269a:	f7ff ff91 	bl	80025c0 <go_forward>
- 800269e:	2005      	movs	r0, #5
- 80026a0:	f001 ffb6 	bl	8004610 <get_prox>
- 80026a4:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
- 80026a8:	dbf7      	blt.n	800269a <execute_sound_command+0x3a>
- 80026aa:	9a01      	ldr	r2, [sp, #4]
- 80026ac:	6823      	ldr	r3, [r4, #0]
- 80026ae:	429a      	cmp	r2, r3
- 80026b0:	d126      	bne.n	8002700 <execute_sound_command+0xa0>
- 80026b2:	b002      	add	sp, #8
- 80026b4:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
- 80026b8:	f7ff be92 	b.w	80023e0 <stop>
- 80026bc:	f7ff ffa0 	bl	8002600 <half_turn>
- 80026c0:	f7ff ff7e 	bl	80025c0 <go_forward>
- 80026c4:	2005      	movs	r0, #5
- 80026c6:	f001 ffa3 	bl	8004610 <get_prox>
- 80026ca:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
- 80026ce:	dbf7      	blt.n	80026c0 <execute_sound_command+0x60>
- 80026d0:	2002      	movs	r0, #2
- 80026d2:	f001 ff9d 	bl	8004610 <get_prox>
- 80026d6:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
- 80026da:	dbf1      	blt.n	80026c0 <execute_sound_command+0x60>
- 80026dc:	e7e5      	b.n	80026aa <execute_sound_command+0x4a>
- 80026de:	f7ff febf 	bl	8002460 <turn_right_90>
- 80026e2:	f7ff ff6d 	bl	80025c0 <go_forward>
- 80026e6:	2002      	movs	r0, #2
- 80026e8:	f001 ff92 	bl	8004610 <get_prox>
- 80026ec:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
- 80026f0:	dbf7      	blt.n	80026e2 <execute_sound_command+0x82>
- 80026f2:	e7da      	b.n	80026aa <execute_sound_command+0x4a>
- 80026f4:	9a01      	ldr	r2, [sp, #4]
- 80026f6:	6823      	ldr	r3, [r4, #0]
- 80026f8:	429a      	cmp	r2, r3
- 80026fa:	d101      	bne.n	8002700 <execute_sound_command+0xa0>
- 80026fc:	b002      	add	sp, #8
- 80026fe:	bd10      	pop	{r4, pc}
- 8002700:	f7ff fd8e 	bl	8002220 <__stack_chk_fail>
- 8002704:	20000b00 	.word	0x20000b00
-	...
+ 800266a:	3801      	subs	r0, #1
+ 800266c:	2804      	cmp	r0, #4
+ 800266e:	d842      	bhi.n	80026f6 <execute_sound_command+0x96>
+ 8002670:	e8df f000 	tbb	[pc, r0]
+ 8002674:	3612091c 	.word	0x3612091c
+ 8002678:	25          	.byte	0x25
+ 8002679:	00          	.byte	0x00
+ 800267a:	2002      	movs	r0, #2
+ 800267c:	f001 ffc8 	bl	8004610 <get_prox>
+ 8002680:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
+ 8002684:	da12      	bge.n	80026ac <execute_sound_command+0x4c>
+ 8002686:	f7ff ff9b 	bl	80025c0 <go_forward>
+ 800268a:	2005      	movs	r0, #5
+ 800268c:	f001 ffc0 	bl	8004610 <get_prox>
+ 8002690:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
+ 8002694:	dbf7      	blt.n	8002686 <execute_sound_command+0x26>
+ 8002696:	e7f0      	b.n	800267a <execute_sound_command+0x1a>
+ 8002698:	f7ff ff12 	bl	80024c0 <turn_left_90>
+ 800269c:	f7ff ff90 	bl	80025c0 <go_forward>
+ 80026a0:	2005      	movs	r0, #5
+ 80026a2:	f001 ffb5 	bl	8004610 <get_prox>
+ 80026a6:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
+ 80026aa:	dbf7      	blt.n	800269c <execute_sound_command+0x3c>
+ 80026ac:	9a01      	ldr	r2, [sp, #4]
+ 80026ae:	6823      	ldr	r3, [r4, #0]
+ 80026b0:	429a      	cmp	r2, r3
+ 80026b2:	d126      	bne.n	8002702 <execute_sound_command+0xa2>
+ 80026b4:	b002      	add	sp, #8
+ 80026b6:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+ 80026ba:	f7ff be91 	b.w	80023e0 <stop>
+ 80026be:	f7ff ff9f 	bl	8002600 <half_turn>
+ 80026c2:	f7ff ff7d 	bl	80025c0 <go_forward>
+ 80026c6:	2005      	movs	r0, #5
+ 80026c8:	f001 ffa2 	bl	8004610 <get_prox>
+ 80026cc:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
+ 80026d0:	dbf7      	blt.n	80026c2 <execute_sound_command+0x62>
+ 80026d2:	2002      	movs	r0, #2
+ 80026d4:	f001 ff9c 	bl	8004610 <get_prox>
+ 80026d8:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
+ 80026dc:	dbf1      	blt.n	80026c2 <execute_sound_command+0x62>
+ 80026de:	e7e5      	b.n	80026ac <execute_sound_command+0x4c>
+ 80026e0:	f7ff febe 	bl	8002460 <turn_right_90>
+ 80026e4:	f7ff ff6c 	bl	80025c0 <go_forward>
+ 80026e8:	2002      	movs	r0, #2
+ 80026ea:	f001 ff91 	bl	8004610 <get_prox>
+ 80026ee:	f5b0 7fe1 	cmp.w	r0, #450	; 0x1c2
+ 80026f2:	dbf7      	blt.n	80026e4 <execute_sound_command+0x84>
+ 80026f4:	e7da      	b.n	80026ac <execute_sound_command+0x4c>
+ 80026f6:	9a01      	ldr	r2, [sp, #4]
+ 80026f8:	6823      	ldr	r3, [r4, #0]
+ 80026fa:	429a      	cmp	r2, r3
+ 80026fc:	d101      	bne.n	8002702 <execute_sound_command+0xa2>
+ 80026fe:	b002      	add	sp, #8
+ 8002700:	bd10      	pop	{r4, pc}
+ 8002702:	f7ff fd8d 	bl	8002220 <__stack_chk_fail>
+ 8002706:	bf00      	nop
+ 8002708:	20000b00 	.word	0x20000b00
+ 800270c:	00000000 	.word	0x00000000
 
 08002710 <general_command>:
  8002710:	b510      	push	{r4, lr}
- 8002712:	4c36      	ldr	r4, [pc, #216]	; (80027ec <general_command+0xdc>)
+ 8002712:	4c35      	ldr	r4, [pc, #212]	; (80027e8 <general_command+0xd8>)
  8002714:	b082      	sub	sp, #8
  8002716:	6823      	ldr	r3, [r4, #0]
  8002718:	9301      	str	r3, [sp, #4]
  800271a:	2808      	cmp	r0, #8
  800271c:	d81f      	bhi.n	800275e <general_command+0x4e>
  800271e:	e8df f000 	tbb	[pc, r0]
- 8002722:	1e4d      	.short	0x1e4d
- 8002724:	5a1e1e1e 	.word	0x5a1e1e1e
+ 8002722:	1e4b      	.short	0x1e4b
+ 8002724:	581e1e1e 	.word	0x581e1e1e
  8002728:	2c0d      	.short	0x2c0d
  800272a:	42          	.byte	0x42
  800272b:	00          	.byte	0x00
@@ -3365,7 +3367,7 @@ Disassembly of section .text:
  800275e:	9a01      	ldr	r2, [sp, #4]
  8002760:	6823      	ldr	r3, [r4, #0]
  8002762:	429a      	cmp	r2, r3
- 8002764:	d140      	bne.n	80027e8 <general_command+0xd8>
+ 8002764:	d13e      	bne.n	80027e4 <general_command+0xd4>
  8002766:	b002      	add	sp, #8
  8002768:	bd10      	pop	{r4, pc}
  800276a:	2000      	movs	r0, #0
@@ -3388,36 +3390,35 @@ Disassembly of section .text:
  800279e:	6823      	ldr	r3, [r4, #0]
  80027a0:	429a      	cmp	r2, r3
  80027a2:	d0e0      	beq.n	8002766 <general_command+0x56>
- 80027a4:	e020      	b.n	80027e8 <general_command+0xd8>
- 80027a6:	f7ff ff2b 	bl	8002600 <half_turn>
- 80027aa:	9a01      	ldr	r2, [sp, #4]
- 80027ac:	6823      	ldr	r3, [r4, #0]
- 80027ae:	429a      	cmp	r2, r3
- 80027b0:	d11a      	bne.n	80027e8 <general_command+0xd8>
- 80027b2:	b002      	add	sp, #8
- 80027b4:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
- 80027b8:	f7ff bf02 	b.w	80025c0 <go_forward>
- 80027bc:	f7ff fe10 	bl	80023e0 <stop>
- 80027c0:	9a01      	ldr	r2, [sp, #4]
- 80027c2:	6823      	ldr	r3, [r4, #0]
- 80027c4:	429a      	cmp	r2, r3
- 80027c6:	d10f      	bne.n	80027e8 <general_command+0xd8>
- 80027c8:	4909      	ldr	r1, [pc, #36]	; (80027f0 <general_command+0xe0>)
- 80027ca:	480a      	ldr	r0, [pc, #40]	; (80027f4 <general_command+0xe4>)
- 80027cc:	b002      	add	sp, #8
- 80027ce:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
- 80027d2:	f7ff bd3d 	b.w	8002250 <chprintf.constprop.0>
- 80027d6:	9a01      	ldr	r2, [sp, #4]
- 80027d8:	6823      	ldr	r3, [r4, #0]
- 80027da:	429a      	cmp	r2, r3
- 80027dc:	d104      	bne.n	80027e8 <general_command+0xd8>
- 80027de:	b002      	add	sp, #8
- 80027e0:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
- 80027e4:	f7ff be9c 	b.w	8002520 <go_forward_regulator>
- 80027e8:	f7ff fd1a 	bl	8002220 <__stack_chk_fail>
- 80027ec:	20000b00 	.word	0x20000b00
- 80027f0:	08011ff0 	.word	0x08011ff0
- 80027f4:	20010794 	.word	0x20010794
+ 80027a4:	e01e      	b.n	80027e4 <general_command+0xd4>
+ 80027a6:	9a01      	ldr	r2, [sp, #4]
+ 80027a8:	6823      	ldr	r3, [r4, #0]
+ 80027aa:	429a      	cmp	r2, r3
+ 80027ac:	d11a      	bne.n	80027e4 <general_command+0xd4>
+ 80027ae:	b002      	add	sp, #8
+ 80027b0:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+ 80027b4:	f7ff bf24 	b.w	8002600 <half_turn>
+ 80027b8:	f7ff fe12 	bl	80023e0 <stop>
+ 80027bc:	9a01      	ldr	r2, [sp, #4]
+ 80027be:	6823      	ldr	r3, [r4, #0]
+ 80027c0:	429a      	cmp	r2, r3
+ 80027c2:	d10f      	bne.n	80027e4 <general_command+0xd4>
+ 80027c4:	4909      	ldr	r1, [pc, #36]	; (80027ec <general_command+0xdc>)
+ 80027c6:	480a      	ldr	r0, [pc, #40]	; (80027f0 <general_command+0xe0>)
+ 80027c8:	b002      	add	sp, #8
+ 80027ca:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+ 80027ce:	f7ff bd3f 	b.w	8002250 <chprintf.constprop.1>
+ 80027d2:	9a01      	ldr	r2, [sp, #4]
+ 80027d4:	6823      	ldr	r3, [r4, #0]
+ 80027d6:	429a      	cmp	r2, r3
+ 80027d8:	d104      	bne.n	80027e4 <general_command+0xd4>
+ 80027da:	b002      	add	sp, #8
+ 80027dc:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+ 80027e0:	f7ff be9e 	b.w	8002520 <go_forward_regulator>
+ 80027e4:	f7ff fd1c 	bl	8002220 <__stack_chk_fail>
+ 80027e8:	20000b00 	.word	0x20000b00
+ 80027ec:	08011ff0 	.word	0x08011ff0
+ 80027f0:	20010794 	.word	0x20010794
 	...
 
 08002800 <automatic_command>:
@@ -3672,9 +3673,9 @@ Disassembly of section .text:
  8002a9e:	d00e      	beq.n	8002abe <wait_receive_order+0x3e>
  8002aa0:	2c04      	cmp	r4, #4
  8002aa2:	d101      	bne.n	8002aa8 <wait_receive_order+0x28>
- 8002aa4:	2801      	cmp	r0, #1
+ 8002aa4:	2802      	cmp	r0, #2
  8002aa6:	d0f3      	beq.n	8002a90 <wait_receive_order+0x10>
- 8002aa8:	2805      	cmp	r0, #5
+ 8002aa8:	2806      	cmp	r0, #6
  8002aaa:	d0f1      	beq.n	8002a90 <wait_receive_order+0x10>
  8002aac:	9a01      	ldr	r2, [sp, #4]
  8002aae:	683b      	ldr	r3, [r7, #0]
@@ -3682,10 +3683,10 @@ Disassembly of section .text:
  8002ab2:	d107      	bne.n	8002ac4 <wait_receive_order+0x44>
  8002ab4:	b003      	add	sp, #12
  8002ab6:	bdf0      	pop	{r4, r5, r6, r7, pc}
- 8002ab8:	2803      	cmp	r0, #3
+ 8002ab8:	2804      	cmp	r0, #4
  8002aba:	d1f5      	bne.n	8002aa8 <wait_receive_order+0x28>
  8002abc:	e7e8      	b.n	8002a90 <wait_receive_order+0x10>
- 8002abe:	2802      	cmp	r0, #2
+ 8002abe:	2803      	cmp	r0, #3
  8002ac0:	d1f2      	bne.n	8002aa8 <wait_receive_order+0x28>
  8002ac2:	e7e5      	b.n	8002a90 <wait_receive_order+0x10>
  8002ac4:	f7ff fbac 	bl	8002220 <__stack_chk_fail>
@@ -3731,12 +3732,12 @@ Disassembly of section .text:
  8002b38:	2a02      	cmp	r2, #2
  8002b3a:	4b23      	ldr	r3, [pc, #140]	; (8002bc8 <sound_remote+0xe8>)
  8002b3c:	bf94      	ite	ls
- 8002b3e:	2200      	movls	r2, #0
- 8002b40:	2205      	movhi	r2, #5
+ 8002b3e:	2201      	movls	r2, #1
+ 8002b40:	2206      	movhi	r2, #6
  8002b42:	701a      	strb	r2, [r3, #0]
  8002b44:	e002      	b.n	8002b4c <sound_remote+0x6c>
  8002b46:	4b20      	ldr	r3, [pc, #128]	; (8002bc8 <sound_remote+0xe8>)
- 8002b48:	2202      	movs	r2, #2
+ 8002b48:	2203      	movs	r2, #3
  8002b4a:	701a      	strb	r2, [r3, #0]
  8002b4c:	2320      	movs	r3, #32
  8002b4e:	f383 8811 	msr	BASEPRI, r3
@@ -3770,17 +3771,17 @@ Disassembly of section .text:
  8002b98:	b002      	add	sp, #8
  8002b9a:	bd10      	pop	{r4, pc}
  8002b9c:	4b0a      	ldr	r3, [pc, #40]	; (8002bc8 <sound_remote+0xe8>)
- 8002b9e:	2201      	movs	r2, #1
+ 8002b9e:	2202      	movs	r2, #2
  8002ba0:	701a      	strb	r2, [r3, #0]
  8002ba2:	e7d3      	b.n	8002b4c <sound_remote+0x6c>
  8002ba4:	f003 f93c 	bl	8005e20 <chSemSignalI>
  8002ba8:	e7dd      	b.n	8002b66 <sound_remote+0x86>
  8002baa:	4b07      	ldr	r3, [pc, #28]	; (8002bc8 <sound_remote+0xe8>)
- 8002bac:	2203      	movs	r2, #3
+ 8002bac:	2204      	movs	r2, #4
  8002bae:	701a      	strb	r2, [r3, #0]
  8002bb0:	e7cc      	b.n	8002b4c <sound_remote+0x6c>
  8002bb2:	4b05      	ldr	r3, [pc, #20]	; (8002bc8 <sound_remote+0xe8>)
- 8002bb4:	2204      	movs	r2, #4
+ 8002bb4:	2205      	movs	r2, #5
  8002bb6:	701a      	strb	r2, [r3, #0]
  8002bb8:	e7c8      	b.n	8002b4c <sound_remote+0x6c>
  8002bba:	f7ff fb31 	bl	8002220 <__stack_chk_fail>

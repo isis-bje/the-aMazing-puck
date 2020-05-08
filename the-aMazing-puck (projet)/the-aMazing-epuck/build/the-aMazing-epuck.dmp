@@ -56,21 +56,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
  17 .comment      0000015e  00000000  00000000  000315c9  2**0
                   CONTENTS, READONLY
- 18 .debug_info   000ef35c  00000000  00000000  00031727  2**0
+ 18 .debug_info   000ef376  00000000  00000000  00031727  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_abbrev 0001055e  00000000  00000000  00120a83  2**0
+ 19 .debug_abbrev 0001058b  00000000  00000000  00120a9d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 20 .debug_loc    000175f2  00000000  00000000  00130fe1  2**0
+ 20 .debug_loc    0001758e  00000000  00000000  00131028  2**0
                   CONTENTS, READONLY, DEBUGGING
- 21 .debug_aranges 00001bb8  00000000  00000000  001485d8  2**3
+ 21 .debug_aranges 00001bb8  00000000  00000000  001485b8  2**3
                   CONTENTS, READONLY, DEBUGGING
- 22 .debug_ranges 00003ac0  00000000  00000000  0014a190  2**0
+ 22 .debug_ranges 00003ac0  00000000  00000000  0014a170  2**0
                   CONTENTS, READONLY, DEBUGGING
- 23 .debug_line   0002cd03  00000000  00000000  0014dc50  2**0
+ 23 .debug_line   0002a911  00000000  00000000  0014dc30  2**0
                   CONTENTS, READONLY, DEBUGGING
- 24 .debug_str    00008ea1  00000000  00000000  0017a953  2**0
+ 24 .debug_str    00008ec8  00000000  00000000  00178541  2**0
                   CONTENTS, READONLY, DEBUGGING
- 25 .debug_frame  0000820c  00000000  00000000  001837f4  2**2
+ 25 .debug_frame  0000820c  00000000  00000000  0018140c  2**2
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 08000000 l    d  startup	00000000 startup
@@ -135,7 +135,7 @@ e000ed04 l       *ABS*	00000000 SCB_ICSR
 200015a8 l     O .bss	00000001 mode.12703
 20000b20 l     O .data	0000000c ser_cfg.12699
 00000000 l    df *ABS*	00000000 move.c
-08002250 l     F .text	00000038 chprintf.constprop.0
+08002250 l     F .text	00000038 chprintf.constprop.1
 08002a10 l     F .text	0000003c ThdMove
 200015a9 l     O .bss	00000001 program
 200015b0 l     O .bss	00000378 waThdMove
@@ -509,7 +509,7 @@ e000ed04 l       *ABS*	00000000 SCB_ICSR
 08006380 g     F .text	00000038 chIQObjectInit
 08005a40 g     F .text	0000002c chTMStartMeasurementX
 0800beb0 g     F .text	0000005c usb_lld_prepare_receive
-08002660 g     F .text	000000a8 execute_sound_command
+08002660 g     F .text	000000ac execute_sound_command
 20010714 g     O .bss	00000010 GPTD6
 08004530 g     F .text	000000a0 proximity_start
 0800cc70 g     F .text	00000050 SysTick_Handler
@@ -889,7 +889,7 @@ e000ed04 l       *ABS*	00000000 SCB_ICSR
 0800a450 g     F .text	000000ac Vector90
 080062b0 g     F .text	0000006c chEvtSignalI
 080070d0 g     F .text	00000028 i2sObjectInit
-08002340 g     F .text	000000a0 junction_detection
+08002340 g     F .text	0000009c junction_detection
 08007320 g     F .text	00000084 pwmChangePeriod
 08008500 g     F .text	00000060 sduRequestsHook
 08001070 g       .text	00000000 arm_bitreversal_32
@@ -967,7 +967,7 @@ e000ed04 l       *ABS*	00000000 SCB_ICSR
 08003170 g     F .text	00000030 spi3SlaveObjectInit
 08009ae0 g     F .text	00000188 Vector88
 20001590 g     O .data	00000004 __malloc_trim_threshold
-08002710 g     F .text	000000e8 general_command
+08002710 g     F .text	000000e4 general_command
 08004870 g     F .text	00000024 messagebus_lock_release
 20000400 g       .pstack	00000000 __main_thread_stack_base__
 08011840 g     F .text	000000ec __mdiff

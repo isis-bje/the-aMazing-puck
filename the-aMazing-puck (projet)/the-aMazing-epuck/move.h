@@ -15,14 +15,15 @@ enum flip{OFF, ON};
 #define AUTO                        4
 #define SEMIAUTO                    12
 
-#define THRESHOLD_WALL		      	450 // valeur de seuil pour détecter une ouverture, ajustée expérimentalement
-#define THRESHOLD_FRONT             500 // valeur de seuil pour détecter un mur frontal, ajustée expérimentalement
-#define THRESHOLD_BACK              400 // valeur de seuil pour détecter un mur arrière, ajustée expérimentalement
+#define THRESHOLD_JUNCTION          250 // threshold used to detect a front wall for junction detection
+#define THRESHOLD_WALL		      	450 // threshold used to detect a side opening
+#define THRESHOLD_FRONT             500 // threshold used to detect a front wall for center positioning in a junction
+#define THRESHOLD_BACK              400 // threshold used to detect a back wall
 
 #define WHEEL_PERIMETER				13
 #define NBSTEPS_ONE_TURN			1000
-#define QUARTER_TURN_ABS       		327 //423 selon le calcul théorique, ajusté expérimentalement pour 1/4 tour
-#define HALF_TURN_ABS				654 //846 selon le calcul théorique, ajusté expérimentalement pour 1/2 tour
+#define QUARTER_TURN_ABS       		327 //423 is the theoretical value, adjusted experimentally
+#define HALF_TURN_ABS				654 //846 is the theoretical value, adjusted experimentally
 #define KP		                    0.01
 
 #define SLEEP_TIME				 	50 //[ms]
