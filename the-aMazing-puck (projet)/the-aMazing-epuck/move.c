@@ -48,7 +48,7 @@ static THD_FUNCTION(ThdMove, arg)
 	while(1){
 
 		node_type = junction_detection(path);
-		print_measures(path);
+		//print_measures(path);
 
 		move_command(node_type);
 
@@ -93,11 +93,14 @@ uint8_t junction_detection(int32_t find_path[]){
 	{
 		left_motor_set_pos(0);
 		right_motor_set_pos(0);
+
 		do{
 			go_forward();
+			measure_dist(find_path);
 		}while((left_motor_get_pos() < MIDDLE && right_motor_get_pos() < MIDDLE) || 						// go to the middle of the junction
-			   (find_path[FRONT_LEFT] > THRESHOLD_FRONT && find_path[FRONT_RIGHT] > THRESHOLD_FRONT));  	// if too close to a wall
+			   (find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT));  	// if too close to a wall
 		stop();
+
 		if(find_path[SIDE_LEFT] < THRESHOLD_WALL && find_path[SIDE_RIGHT] < THRESHOLD_WALL) 				// if opening left and right
 		{
 			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT) 		// if opening forward
@@ -172,8 +175,8 @@ void print_measures(int32_t path[]){
 	chprintf((BaseSequentialStream *) &SD3, "Capteur front side right: %d \r\n", path[FRONT_SIDE_RIGHT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur side left: %d \r\n", path[SIDE_LEFT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur side right: %d \r\n", path[SIDE_RIGHT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur back left: %d \n", path[BACK_LEFT]);
-	chprintf((BaseSequentialStream *) &SD3, "Capteur back right: %d \n", path[BACK_RIGHT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur back left: %d \r\n", path[BACK_LEFT]);
+	chprintf((BaseSequentialStream *) &SD3, "Capteur back right: %d \r\n", path[BACK_RIGHT]);
 }
 
 void measure_dist_cal(int32_t dist_cal[NB_CAPTEURS]){
@@ -452,7 +455,7 @@ void general_command(uint8_t node_type){
 
 		case NODE_ERROR :
 			stop();
-			chprintf((BaseSequentialStream *) &SD3, "error");
+			chprintf((BaseSequentialStream *) &SD3, "error \r\n");
 			break;
 
 		case STRAIGHT_PATH :
