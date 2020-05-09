@@ -93,7 +93,7 @@ uint8_t junction_detection(int32_t find_path[]){
 	{
 		left_motor_set_pos(0);
 		right_motor_set_pos(0);
-
+		chprintf((BaseSequentialStream *) &SD3, "JUNCTION DETECTED, GOING INSIDE \r\n");
 		do{
 			go_forward();
 			measure_dist(find_path);
@@ -311,10 +311,12 @@ void execute_sound_command(uint8_t command){
 	switch(command){
 
 		case STOP :
+			chprintf((BaseSequentialStream *) &SD3, "ORDER: STOP \r\n");
 			stop();
 			break;
 
 		case GO_FORWARD :
+			chprintf((BaseSequentialStream *) &SD3, "ORDER: FORWARD \r\n");
 			do{  //avance jusqu'à sortir de la jonction
 				go_forward();
 			}while(get_prox(SIDE_LEFT) < THRESHOLD_WALL || get_prox(SIDE_RIGHT) < THRESHOLD_WALL);
@@ -322,6 +324,7 @@ void execute_sound_command(uint8_t command){
 			break;
 
 		case TURN_LEFT :
+			chprintf((BaseSequentialStream *) &SD3, "ORDER: LEFT \r\n");
 			turn_left_90();
 			do{  //avance jusqu'à sortir de la jonction
 				go_forward();
@@ -330,6 +333,7 @@ void execute_sound_command(uint8_t command){
 			break;
 
 		case TURN_RIGHT :
+			chprintf((BaseSequentialStream *) &SD3, "ORDER: RIGHT \r\n");
 			turn_right_90();
 			do{  //avance jusqu'à sortir de la jonction
 				go_forward();
@@ -338,6 +342,7 @@ void execute_sound_command(uint8_t command){
 			break;
 
 		case HALF_TURN :
+			chprintf((BaseSequentialStream *) &SD3, "ORDER: HALF TURN \r\n");
 			half_turn();
 			do{  //avance jusqu'à sortir de la jonction
 				go_forward();
@@ -355,6 +360,7 @@ void automatic_command(uint8_t node_type){
 	switch(node_type){
 
 		case CROSSROAD :
+			chprintf((BaseSequentialStream *) &SD3, "CROSSROAD, TURNING RIGHT \r\n");
 			turn_right_90();
 			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
@@ -362,10 +368,12 @@ void automatic_command(uint8_t node_type){
 			break;
 
 		case T_JUNCTION_LEFT :
+			chprintf((BaseSequentialStream *) &SD3, "T LEFT, GOING FORWARD \r\n");
 			go_forward();
 			break;
 
 		case T_JUNCTION_RIGHT :
+			chprintf((BaseSequentialStream *) &SD3, "T RIGHT, TURNING RIGHT \r\n");
 			turn_right_90();
 			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
@@ -373,6 +381,7 @@ void automatic_command(uint8_t node_type){
 			break;
 
 		case T_JUNCTION :
+			chprintf((BaseSequentialStream *) &SD3, "T JUNCTION, TURNING RIGHT \r\n");
 			turn_right_90();
 			while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
@@ -455,14 +464,16 @@ void general_command(uint8_t node_type){
 
 		case NODE_ERROR :
 			stop();
-			chprintf((BaseSequentialStream *) &SD3, "error \r\n");
+			chprintf((BaseSequentialStream *) &SD3, "NODE TYPE ERROR \r\n");
 			break;
 
 		case STRAIGHT_PATH :
+			chprintf((BaseSequentialStream *) &SD3, "CORRIDOR, GOING FORWARD \r\n");
 			go_forward_regulator();
 			break;
 
 		case CORNER_LEFT :
+			chprintf((BaseSequentialStream *) &SD3, "CORNER LEFT, TURNING LEFT \r\n");
 			turn_left_90();
 			while(get_prox(SIDE_LEFT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
@@ -470,6 +481,7 @@ void general_command(uint8_t node_type){
 			break;
 
 		case CORNER_RIGHT :
+			chprintf((BaseSequentialStream *) &SD3, "CORNER RIGHT, TURNING RIGHT \r\n");
 			turn_right_90();
 			while(get_prox(SIDE_RIGHT) < THRESHOLD_WALL){  //tant que le croisement n'a pas été passé
 				go_forward();
@@ -477,6 +489,7 @@ void general_command(uint8_t node_type){
 			break;
 
 		case CUL_DE_SAC :
+			chprintf((BaseSequentialStream *) &SD3, "CUL DE SAC, GOING BACK \r\n");
 			half_turn();
 			break;
 
