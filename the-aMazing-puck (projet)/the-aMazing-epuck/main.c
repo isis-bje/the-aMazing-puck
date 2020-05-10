@@ -41,7 +41,7 @@ static void serial_start(void){
 	sdStart(&SD3, &ser_cfg); //UART3.
 }
 
-//-----------------------------------------MAIN------------------------------------------
+//-------------------------------------MAIN------------------------------------
 
 int main(void){
 
@@ -64,10 +64,7 @@ int main(void){
     //initialize the motors
     motors_init();
 
-    //start the microphone
-    //mic_start(&processSound); //processSound is a callback function used when samples are ready
-
-	//LAUNCH MODE : OTHER -> The epuck is still until a mode is selected
+	//LAUNCH MODE : OTHER -> The e-puck is still until a mode is selected
     //				SOUTH -> AUTOMATIC MODE (4)
 	//				NORTH -> SEMI-AUTOMATIC MODE (12)
 
@@ -76,33 +73,27 @@ int main(void){
     while (mode != AUTO && mode != SEMIAUTO){
 
     	mode = get_selector();
-    	chThdSleepMilliseconds(1000);
-
+    	chThdSleepMilliseconds(20*SLEEP_TIME);
     }
 
-    if(mode == AUTO){
-    	chprintf((BaseSequentialStream *) &SD3, "AUTOMATIC\r\n");
-    }
-    else if (mode == SEMIAUTO){
-		chprintf((BaseSequentialStream *) &SD3, "SEMI-AUTO\r\n");
+   if (mode == SEMIAUTO){
+
+		//start the microphone
 		mic_start(&processSound);
     }
 
     //starts the threads that controls the movement of the robot
     move_start(mode);
 
-    /* Infinite loop. */
+    // infinite loop
     while (1){
 
-    	//waits 1 second
-    	chThdSleepMilliseconds(1000);
-
+    	chThdSleepMilliseconds(20*SLEEP_TIME); //waits 1 second
     	chprintf((BaseSequentialStream *) &SD3, "Sleep\r\n"); //to be removed
-
     }
 }
 
-//-------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 #define STACK_CHK_GUARD 0xe2dee396
 uintptr_t __stack_chk_guard = STACK_CHK_GUARD;
