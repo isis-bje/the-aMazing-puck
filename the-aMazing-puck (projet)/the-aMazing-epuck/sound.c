@@ -83,12 +83,14 @@ uint8_t wait_receive_order(uint8_t node_type){
 	return command;
 }
 
-/* Purpose : Callback used when the demodulation of the four microphones is done (the samples are ready).
+/* Purpose : Callback used when the demodulation of the four microphones
+ * 			 is done (the samples are ready).
  *
  * Parameters :
  *
- * (in)  int16_t *data		   Points to the buffer containing 4 times 160 samples taken every 10 ms (16kHz).
- *	                           The samples are sorted by microphones (4).
+ * (in)  int16_t *data		   Points to the buffer containing 4 times 160
+ * 							   samples taken every 10 ms (16kHz).
+ *	 	 	 	 	 	 	   The samples are sorted by microphones (4).
  *
  * (in)  uint16_t num_samples  Number of samples taken.
  *
@@ -126,13 +128,13 @@ void processSound(int16_t *data, uint16_t num_samples){
 
 	if(nb_samples >= (2 * FFT_SIZE)){
 
-		//	FFT proccessing
+		//	FFT computation
 		doFFT_optimized(FFT_SIZE, micRight_cmplx_input);
 		doFFT_optimized(FFT_SIZE, micLeft_cmplx_input);
 		doFFT_optimized(FFT_SIZE, micFront_cmplx_input);
 		doFFT_optimized(FFT_SIZE, micBack_cmplx_input);
 
-		//	Magnitude processing
+		//	Magnitude computation
 		arm_cmplx_mag_f32(micRight_cmplx_input, micRight_output, FFT_SIZE);
 		arm_cmplx_mag_f32(micLeft_cmplx_input, micLeft_output, FFT_SIZE);
 		arm_cmplx_mag_f32(micFront_cmplx_input, micFront_output, FFT_SIZE);
@@ -146,11 +148,13 @@ void processSound(int16_t *data, uint16_t num_samples){
 
 //-----------------------------Internal Functions-----------------------------
 
-/* Purpose : Detect the highest value in a buffer and attribute a movement command depending on it
+/* Purpose : Detect the highest value in a buffer and attribute a movement
+ * 			 command depending on it
  *
  * Parameters :
  *
- * (in)  float* data   Points to the buffer containing 4 times 160 samples taken every 10 ms (16kHz).
+ * (in)  float* data   Points to the buffer containing 4 times 160 samples
+ * 					   taken every 10 ms (16kHz).
  * 				       The samples are sorted by microphones (4).
  *
  */
@@ -194,7 +198,8 @@ void sound_remote(float* data){
 		command = RETRY;
 	}
 
-	chBSemSignal(&get_order_sem); //once a command is found a signal is issued
+	//once a command is found a signal is issued
+	chBSemSignal(&get_order_sem);
 }
 
 /* Purpose : To compute the FFT with an optimized function from a library.

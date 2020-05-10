@@ -29,12 +29,13 @@ enum flip{OFF, ON};
 #define THRESHOLD_FRONT             550  // threshold used to detect a front wall
 #define THRESHOLD_BACK              400  // threshold used to detect a back wall
 
+#define SPEED                       500
 #define WHEEL_PERIMETER				13
-#define NBSTEPS_ONE_TURN			1000 // theoretical value
-#define MIDDLE_JUNCTION				260  // adjusted number of steps to get to the middle of a junction
-#define QUARTER_TURN_ABS       		327  // adjusted number of steps to do a quarter turn, 423 is the theoretical value
-#define HALF_TURN_ABS				654  // adjusted number of steps to do a half turn, 846 is the theoretical value
-#define KP		                    0.01 // adjusted value of the proportional regulator
+#define NBSTEPS_ONE_TURN			1000  // theoretical value
+#define MIDDLE_JUNCTION				320   // adjusted number of steps to get to the middle of a junction
+#define QUARTER_TURN_ABS       		327   // adjusted number of steps to do a quarter turn, 423 is the theoretical value
+#define HALF_TURN_ABS				654   // adjusted number of steps to do a half turn, 846 is the theoretical value
+#define KP		                    0.012 // adjusted value of the proportional regulator
 
 //-----------------------------Static Variables-----------------------------
 
@@ -104,7 +105,8 @@ void move_start(uint8_t mode){
 
 //-----------------------------Internal Functions-----------------------------
 
-/* Purpose : Launches the correct execution function according to the mode the e-puck is in.
+/* Purpose : Launches the correct execution function according to the mode the
+ * 			 e-puck is in.
  *
  * Parameters :
  *
@@ -124,71 +126,100 @@ void move_command(uint8_t node_type){
 	}
 }
 
-/* Purpose : Compares the values returned by the proximity sensors with thresholds
- * 			 in order to determine the junction the e-puck is in
+/* Purpose : Compares the values returned by the proximity sensors with
+ * 			 thresholds in order to determine the junction the e-puck is in.
  *
  * Parameters :
  *
- * (in)  in32_t find_path[]    Array for the values of the proximity sensors
+ * (in)  in32_t find_path[]    Array with the values measured by the proximity
+ * 							   sensors.
+ *
+ * (out) uint8_t node_type	   Indicates the type of junction the e-puck is in
  *
  */
 uint8_t junction_detection(int32_t find_path[]){
 
 	uint8_t node_type = 0;
 
-	measure_dist(find_path);   																				// fill the array with values of the proximity sensors
+	measure_dist(find_path);
 
-	if(find_path[SIDE_LEFT] > THRESHOLD_SIDE_WALL && find_path[SIDE_RIGHT] > THRESHOLD_SIDE_WALL){			// if no opening neither left nor right
+	// there is no opening neither left nor right
+	if(find_path[SIDE_LEFT] > THRESHOLD_SIDE_WALL &&
+	   find_path[SIDE_RIGHT] > THRESHOLD_SIDE_WALL){
 
-		if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT){ 			// if opening forward
+		// an opening ahead is found
+		if(find_path[FRONT_LEFT] < THRESHOLD_FRONT &&
+		   find_path[FRONT_RIGHT] < THRESHOLD_FRONT){
+
 			node_type = STRAIGHT_PATH;
 		}
-		else{																								// if no opening forward
+		// no opening ahead
+		else{
 			node_type = CUL_DE_SAC;
 		}
 	}
-	else if(find_path[SIDE_LEFT] < THRESHOLD_SIDE_WALL || find_path[SIDE_RIGHT] < THRESHOLD_SIDE_WALL){  	// if opening left or right
+	// an opening left or right is found
+	else if(find_path[SIDE_LEFT] < THRESHOLD_SIDE_WALL ||
+			find_path[SIDE_RIGHT] < THRESHOLD_SIDE_WALL){
 
 		left_motor_set_pos(0);
 		right_motor_set_pos(0);
+		// set position counters to 0
 		int left_pos = 0;
 		int right_pos = 0;
 		chprintf((BaseSequentialStream *) &SD3, "JUNCTION DETECTED, GOING INSIDE \r\n");
-		do{																									// loop to go to the middle of the junction
+
+		// loop used to place the e-puck in the middle of the junction
+		do{
 			go_forward();
 			measure_dist(find_path);
 			left_pos = left_motor_get_pos();
 			right_pos = right_motor_get_pos();
 			chprintf((BaseSequentialStream *) &SD3, "steps left: %d \r\n", left_pos);
 			chprintf((BaseSequentialStream *) &SD3, "steps right: %d \r\n", right_pos);
-		}while((left_pos < MIDDLE_JUNCTION && right_pos  < MIDDLE_JUNCTION) &&                        	 	// if we moved enough steps
-			   (find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT));      // if we are too close to a wall
+		}while((left_pos < MIDDLE_JUNCTION && right_pos  < MIDDLE_JUNCTION) &&
+			   (find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT));
+		// either the e-puck has moved enough steps or a wall is too close
 		stop();
 
-		if(find_path[SIDE_LEFT] < THRESHOLD_SIDE_WALL && find_path[SIDE_RIGHT] < THRESHOLD_SIDE_WALL){ 		// if there is an opening left and right
+		// an opening left and right are found
+		if(find_path[SIDE_LEFT] < THRESHOLD_SIDE_WALL &&
+		   find_path[SIDE_RIGHT] < THRESHOLD_SIDE_WALL){
 
-			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT){ 		// if there is an opening forward
+			// an opening ahead is found
+			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT &&
+			   find_path[FRONT_RIGHT] < THRESHOLD_FRONT){
 				node_type = CROSSROAD;
 			}
-			else{																							// if there is no opening forward
+			//there is no opening ahead
+			else{
 				node_type = T_JUNCTION;
 			}
 		}
-		else if(find_path[SIDE_LEFT] < THRESHOLD_SIDE_WALL && find_path[SIDE_RIGHT] > THRESHOLD_SIDE_WALL){ 	// if there is an opening only left
 
-			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT){ 		// if there is an opening forward
+		// there is an opening only on the left side
+		else if(find_path[SIDE_LEFT] < THRESHOLD_SIDE_WALL &&
+				find_path[SIDE_RIGHT] > THRESHOLD_SIDE_WALL){
+			//there is an opening ahead
+			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT &&
+			   find_path[FRONT_RIGHT] < THRESHOLD_FRONT){
 				node_type = T_JUNCTION_LEFT;
 			}
-			else{																							// if there is no opening forward
+			//no opening ahead
+			else{
 				node_type = CORNER_LEFT;
 			}
 		}
-		else if(find_path[SIDE_LEFT] > THRESHOLD_SIDE_WALL && find_path[SIDE_RIGHT] < THRESHOLD_SIDE_WALL){ 	// if there is an opening only right
-
-			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT){ 		// if there is an opening forward
+		// there is an opening only on the right side
+		else if(find_path[SIDE_LEFT] > THRESHOLD_SIDE_WALL &&
+				find_path[SIDE_RIGHT] < THRESHOLD_SIDE_WALL){
+			//there is an opening ahead
+			if(find_path[FRONT_LEFT] < THRESHOLD_FRONT &&
+			   find_path[FRONT_RIGHT] < THRESHOLD_FRONT){
 				node_type = T_JUNCTION_RIGHT;
 			}
-			else{																							// if there is no opening forward
+			//no opening ahead
+			else{
 				node_type = CORNER_RIGHT;
 			}
 		}
@@ -199,7 +230,7 @@ uint8_t junction_detection(int32_t find_path[]){
 }
 
 /* Purpose : Decides what movement needs to be done in automatic mode
- * 			 according to the junction the e-puck is in
+ * 			 according to the junction the e-puck is in.
  *
  * Parameters :
  *
@@ -213,7 +244,9 @@ void automatic_command(uint8_t node_type){
 		case CROSSROAD :
 			chprintf((BaseSequentialStream *) &SD3, "CROSSROAD, TURNING RIGHT \r\n");
 			turn_right_90();
-			while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){	//as long as we didn't move past the junction
+			//as long as the e-puck didn't move past the junction
+			while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL &&
+				  get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){
 				go_forward();
 			}
 			break;
@@ -226,7 +259,9 @@ void automatic_command(uint8_t node_type){
 		case T_JUNCTION_RIGHT :
 			chprintf((BaseSequentialStream *) &SD3, "T RIGHT, TURNING RIGHT \r\n");
 			turn_right_90();
-			while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL && get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){	//as long as we didn't move past the junction
+			//as long as the e-puck didn't move past the junction
+			while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL &&
+				  get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){
 				go_forward();
 			}
 			break;
@@ -234,7 +269,8 @@ void automatic_command(uint8_t node_type){
 		case T_JUNCTION :
 			chprintf((BaseSequentialStream *) &SD3, "T JUNCTION, TURNING RIGHT \r\n");
 			turn_right_90();
-			while(get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){  											//as long as we didn't move past the junction
+			//as long as the e-puck didn't move past the junction
+			while(get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){
 				go_forward();
 			}
 			break;
@@ -246,7 +282,8 @@ void automatic_command(uint8_t node_type){
 	general_command(node_type);
 }
 
-/* Purpose : Launches the sound detection if the e-puck is in a junction with multiple paths
+/* Purpose : Retrieves the command given by sound when the e-puck is in a junction
+ * 			 with multiple paths and calls the execution function.
  *
  * Parameters :
  *
@@ -312,11 +349,13 @@ void semiautomatic_command(uint8_t node_type){
 	}
 
 	execute_sound_command(command);
+
 	general_command(node_type);
 
 }
 
-/* Purpose : Decides what movement needs to be done if the e-puck is in a junction with only one path
+/* Purpose : Decides what movement needs to be done if the e-puck is in a junction
+ * 			 with only one possible path.
  *
  * Parameters :
  *
@@ -340,7 +379,8 @@ void general_command(uint8_t node_type){
 		case CORNER_LEFT :
 			chprintf((BaseSequentialStream *) &SD3, "CORNER LEFT, TURNING LEFT \r\n");
 			turn_left_90();
-			while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL){  												//as long as we didn't move past the junction
+			//as long as the e-puck didn't move past the junction
+			while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL){
 				go_forward();
 			}
 			break;
@@ -348,7 +388,8 @@ void general_command(uint8_t node_type){
 		case CORNER_RIGHT :
 			chprintf((BaseSequentialStream *) &SD3, "CORNER RIGHT, TURNING RIGHT \r\n");
 			turn_right_90();
-			while(get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){  											//as long as we didn't move past the junction
+			//as long as the e-puck didn't move past the junction
+			while(get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){
 				go_forward();
 			}
 			break;
@@ -382,16 +423,19 @@ void execute_sound_command(uint8_t command){
 
 		case GO_FORWARD :
 			chprintf((BaseSequentialStream *) &SD3, "ORDER: FORWARD \r\n");
-			do{  																							//as long as we didn't move past the junction
+			//as long as the e-puck didn't move past the junction
+			do{
 				go_forward();
-			}while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL || get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL);
+			}while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL ||
+				   get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL);
 			stop();
 			break;
 
 		case TURN_LEFT :
 			chprintf((BaseSequentialStream *) &SD3, "ORDER: LEFT \r\n");
 			turn_left_90();
-			do{  																							//as long as we didn't move past the junction
+			//as long as the e-puck didn't move past the junction
+			do{
 				go_forward();
 			}while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL);
 			stop();
@@ -400,7 +444,8 @@ void execute_sound_command(uint8_t command){
 		case TURN_RIGHT :
 			chprintf((BaseSequentialStream *) &SD3, "ORDER: RIGHT \r\n");
 			turn_right_90();
-			do{  																							//as long as we didn't move past the junction
+			//as long as the e-puck didn't move past the junction
+			do{
 				go_forward();
 			}while(get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL);
 			stop();
@@ -409,9 +454,11 @@ void execute_sound_command(uint8_t command){
 		case HALF_TURN :
 			chprintf((BaseSequentialStream *) &SD3, "ORDER: HALF TURN \r\n");
 			half_turn();
-			do{  																							//as long as we didn't move past the junction
+			//as long as the e-puck didn't move past the junction
+			do{
 				go_forward();
-			}while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL || get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL);
+			}while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL ||
+				   get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL);
 			stop();
 			break;
 
@@ -421,7 +468,6 @@ void execute_sound_command(uint8_t command){
 }
 
 /* Purpose : Movement function that stops the e-puck
- *
  */
 void stop(void){
 
@@ -442,9 +488,8 @@ void stop(void){
 
 }
 
-/* Purpose : Movement function that rotates the e-puck
- * 			 90 degrees on its right
- *
+/* Purpose : Movement function that rotates the e-puck 90 degrees
+ * 			 on its right.
  */
 void turn_right_90(void){
 
@@ -453,19 +498,20 @@ void turn_right_90(void){
 	set_led(LED3, ON);
 
 	left_motor_set_pos(0);
-	left_motor_set_speed(500);
-	right_motor_set_speed(-500);
+	left_motor_set_speed(SPEED);
+	right_motor_set_speed(-SPEED);
 
-	while(left_motor_pos < QUARTER_TURN_ABS){   															//as long as we didn't rotate a quarter turn
+	//as long as the e-puck didn't rotate a quarter turn
+	while(left_motor_pos < QUARTER_TURN_ABS){
 		left_motor_pos = left_motor_get_pos();
 	}
+
 	set_led(LED3, OFF);
 	stop();
 }
 
-/* Purpose : Movement function that rotates the e-puck
- * 			 90 degrees on its left
- *
+/* Purpose : Movement function that rotates the e-puck 90 degrees
+ *           on its left.
  */
 void turn_left_90(void){
 
@@ -474,13 +520,14 @@ void turn_left_90(void){
 	set_led(LED7, ON);
 
 	right_motor_set_pos(0);
-	left_motor_set_speed(-500);
-	right_motor_set_speed(500);
+	left_motor_set_speed(-SPEED);
+	right_motor_set_speed(SPEED);
 
-	while(right_motor_pos < QUARTER_TURN_ABS){																//as long as we didn't rotate a quarter turn
+	//as long as we didn't rotate a quarter turn
+	while(right_motor_pos < QUARTER_TURN_ABS){
 		right_motor_pos = right_motor_get_pos();
-
 	}
+
 	set_led(LED7, OFF);
 	stop();
 }
@@ -491,18 +538,19 @@ void turn_left_90(void){
  */
 void go_forward_regulator(void){
 
-	int32_t error_kp = get_prox(SIDE_RIGHT) + get_prox(FRONT_SIDE_RIGHT) - get_prox(SIDE_LEFT) - get_prox(FRONT_SIDE_LEFT);
+	int32_t error_kp = get_prox(SIDE_RIGHT) + get_prox(FRONT_SIDE_RIGHT)
+			         - get_prox(SIDE_LEFT) - get_prox(FRONT_SIDE_LEFT);
 
 	set_led(LED1, ON);
 
-	left_motor_set_speed(500 - error_kp*KP);
-	right_motor_set_speed(500 + error_kp*KP);
+	left_motor_set_speed(SPEED - error_kp*KP);
+	right_motor_set_speed(SPEED + error_kp*KP);
 
 	set_led(LED1, OFF);
 }
 
 /* Purpose : Movement function that moves the e-puck forwards
- * 			 without a proportional regulator (to go in the
+ * 			 without a proportional regulator (to go to the
  * 			 middle or out of a junction)
  *
  */
@@ -510,14 +558,14 @@ void go_forward(void){
 
 	set_led(LED1, ON);
 
-	left_motor_set_speed(500);
-	right_motor_set_speed(500);
+	left_motor_set_speed(SPEED);
+	right_motor_set_speed(SPEED);
 
 	set_led(LED1, OFF);
 }
 
-/* Purpose : Movement function that rotates the e-puck
- * 			 180 degrees on its left
+/* Purpose : Movement function that rotates the e-puck 180 degrees
+ * 			 on its left
  *
  */
 void half_turn(void){
@@ -527,12 +575,13 @@ void half_turn(void){
 	set_led(LED5, ON);
 
 	right_motor_set_pos(0);
-	left_motor_set_speed(-500);
-	right_motor_set_speed(500);
+	left_motor_set_speed(-SPEED);
+	right_motor_set_speed(SPEED);
 
-	while(right_motor_pos < HALF_TURN_ABS){																	//as long as we didn't rotate a half turn
+	//until a half turn is done
+	while(right_motor_pos < HALF_TURN_ABS){
+
 		right_motor_pos = right_motor_get_pos();
-
 	}
 
 	set_led(LED5, OFF);
@@ -540,7 +589,7 @@ void half_turn(void){
 	stop();
 }
 
-/* Purpose : Fills an array with the values of the proximity sensors
+/* Purpose : Fills an array with the measures of the proximity sensors
  *
  * Parameters :
  *
@@ -560,6 +609,7 @@ void measure_dist(int32_t dist[NB_CAPTEURS]){
 }
 
 /* Purpose : Prints the measures of the proximity sensors
+ * 			 Used to monitor the measures in order to determine the thresholds needed.
  *
  * Parameters :
  *

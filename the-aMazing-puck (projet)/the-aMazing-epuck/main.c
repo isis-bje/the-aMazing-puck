@@ -70,13 +70,13 @@ int main(void){
 
     static uint8_t mode = 0;
 
-    while (mode != AUTO && mode != SEMIAUTO){
+    while(mode != AUTO && mode != SEMIAUTO){
 
     	mode = get_selector();
     	chThdSleepMilliseconds(20*SLEEP_TIME);
     }
 
-   if (mode == SEMIAUTO){
+   if(mode == SEMIAUTO){
 
 		//start the microphone
 		mic_start(&processSound);
@@ -86,7 +86,7 @@ int main(void){
     move_start(mode);
 
     // infinite loop
-    while (1){
+    while(1){
 
     	chThdSleepMilliseconds(20*SLEEP_TIME); //waits 1 second
     	chprintf((BaseSequentialStream *) &SD3, "Sleep\r\n"); //to be removed
