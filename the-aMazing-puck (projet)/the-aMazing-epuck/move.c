@@ -59,7 +59,7 @@ void go_forward(void);
 void half_turn(void);
 
 void measure_dist(int32_t dist[NB_CAPTEURS]);
-void print_measures(int32_t path[NB_CAPTEURS]);
+//void print_measures(int32_t path[NB_CAPTEURS]);
 
 //------------------------------Movement Thread------------------------------
 
@@ -167,16 +167,15 @@ uint8_t junction_detection(int32_t find_path[]){
 		// set position counters to 0
 		int left_pos = 0;
 		int right_pos = 0;
-		chprintf((BaseSequentialStream *) &SD3, "JUNCTION DETECTED, GOING INSIDE \r\n");
 
 		// loop used to place the e-puck in the middle of the junction
 		do{
+
 			go_forward();
 			measure_dist(find_path);
 			left_pos = left_motor_get_pos();
 			right_pos = right_motor_get_pos();
-			chprintf((BaseSequentialStream *) &SD3, "steps left: %d \r\n", left_pos);
-			chprintf((BaseSequentialStream *) &SD3, "steps right: %d \r\n", right_pos);
+
 		}while((left_pos < MIDDLE_JUNCTION && right_pos  < MIDDLE_JUNCTION) &&
 			   (find_path[FRONT_LEFT] < THRESHOLD_FRONT && find_path[FRONT_RIGHT] < THRESHOLD_FRONT));
 		// either the e-puck has moved enough steps or a wall is too close
@@ -224,7 +223,6 @@ uint8_t junction_detection(int32_t find_path[]){
 			}
 		}
 	}
-	chprintf((BaseSequentialStream *) &SD3, "node_type: %d\r\n", node_type);
 
 	return node_type;
 }
@@ -242,7 +240,6 @@ void automatic_command(uint8_t node_type){
 	switch(node_type){
 
 		case CROSSROAD :
-			chprintf((BaseSequentialStream *) &SD3, "CROSSROAD, TURNING RIGHT \r\n");
 			turn_right_90();
 			//as long as the e-puck didn't move past the junction
 			while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL &&
@@ -252,12 +249,10 @@ void automatic_command(uint8_t node_type){
 			break;
 
 		case T_JUNCTION_LEFT :
-			chprintf((BaseSequentialStream *) &SD3, "T LEFT, GOING FORWARD \r\n");
 			go_forward();
 			break;
 
 		case T_JUNCTION_RIGHT :
-			chprintf((BaseSequentialStream *) &SD3, "T RIGHT, TURNING RIGHT \r\n");
 			turn_right_90();
 			//as long as the e-puck didn't move past the junction
 			while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL &&
@@ -267,7 +262,6 @@ void automatic_command(uint8_t node_type){
 			break;
 
 		case T_JUNCTION :
-			chprintf((BaseSequentialStream *) &SD3, "T JUNCTION, TURNING RIGHT \r\n");
 			turn_right_90();
 			//as long as the e-puck didn't move past the junction
 			while(get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){
@@ -297,51 +291,19 @@ void semiautomatic_command(uint8_t node_type){
 	switch(node_type){
 
 		case CROSSROAD :
-			set_led(LED1, ON);
-			set_led(LED3, ON);
-			set_led(LED5, ON);
-			set_led(LED7, ON);
 			command = wait_receive_order(node_type);
-			set_led(LED1, OFF);
-			set_led(LED3, OFF);
-			set_led(LED5, OFF);
-			set_led(LED7, OFF);
 			break;
 
 		case T_JUNCTION_LEFT :
-			set_led(LED1, ON);
-			set_led(LED3, ON);
-			set_led(LED5, ON);
-			set_led(LED7, ON);
 			command = wait_receive_order(node_type);
-			set_led(LED1, OFF);
-			set_led(LED3, OFF);
-			set_led(LED5, OFF);
-			set_led(LED7, OFF);
 			break;
 
 		case T_JUNCTION_RIGHT :
-			set_led(LED1, ON);
-			set_led(LED3, ON);
-			set_led(LED5, ON);
-			set_led(LED7, ON);
 			command = wait_receive_order(node_type);
-			set_led(LED1, OFF);
-			set_led(LED3, OFF);
-			set_led(LED5, OFF);
-			set_led(LED7, OFF);
 			break;
 
 		case T_JUNCTION :
-			set_led(LED1, ON);
-			set_led(LED3, ON);
-			set_led(LED5, ON);
-			set_led(LED7, ON);
 			command = wait_receive_order(node_type);
-			set_led(LED1, OFF);
-			set_led(LED3, OFF);
-			set_led(LED5, OFF);
-			set_led(LED7, OFF);
 			break;
 
 		default :
@@ -372,12 +334,10 @@ void general_command(uint8_t node_type){
 			break;
 
 		case STRAIGHT_PATH :
-			chprintf((BaseSequentialStream *) &SD3, "CORRIDOR, GOING FORWARD \r\n");
 			go_forward_regulator();
 			break;
 
 		case CORNER_LEFT :
-			chprintf((BaseSequentialStream *) &SD3, "CORNER LEFT, TURNING LEFT \r\n");
 			turn_left_90();
 			//as long as the e-puck didn't move past the junction
 			while(get_prox(SIDE_LEFT) < THRESHOLD_SIDE_WALL){
@@ -386,7 +346,6 @@ void general_command(uint8_t node_type){
 			break;
 
 		case CORNER_RIGHT :
-			chprintf((BaseSequentialStream *) &SD3, "CORNER RIGHT, TURNING RIGHT \r\n");
 			turn_right_90();
 			//as long as the e-puck didn't move past the junction
 			while(get_prox(SIDE_RIGHT) < THRESHOLD_SIDE_WALL){
@@ -395,7 +354,6 @@ void general_command(uint8_t node_type){
 			break;
 
 		case CUL_DE_SAC :
-			chprintf((BaseSequentialStream *) &SD3, "CUL DE SAC, GOING BACK \r\n");
 			half_turn();
 			break;
 
@@ -417,12 +375,10 @@ void execute_sound_command(uint8_t command){
 	switch(command){
 
 		case STOP :
-			chprintf((BaseSequentialStream *) &SD3, "ORDER: STOP \r\n");
 			stop();
 			break;
 
 		case GO_FORWARD :
-			chprintf((BaseSequentialStream *) &SD3, "ORDER: FORWARD \r\n");
 			//as long as the e-puck didn't move past the junction
 			do{
 				go_forward();
@@ -432,7 +388,6 @@ void execute_sound_command(uint8_t command){
 			break;
 
 		case TURN_LEFT :
-			chprintf((BaseSequentialStream *) &SD3, "ORDER: LEFT \r\n");
 			turn_left_90();
 			//as long as the e-puck didn't move past the junction
 			do{
@@ -442,7 +397,6 @@ void execute_sound_command(uint8_t command){
 			break;
 
 		case TURN_RIGHT :
-			chprintf((BaseSequentialStream *) &SD3, "ORDER: RIGHT \r\n");
 			turn_right_90();
 			//as long as the e-puck didn't move past the junction
 			do{
@@ -452,7 +406,6 @@ void execute_sound_command(uint8_t command){
 			break;
 
 		case HALF_TURN :
-			chprintf((BaseSequentialStream *) &SD3, "ORDER: HALF TURN \r\n");
 			half_turn();
 			//as long as the e-puck didn't move past the junction
 			do{
@@ -616,7 +569,7 @@ void measure_dist(int32_t dist[NB_CAPTEURS]){
  * (in) int32_t path[]   The array containing the values to print
  *
  */
-void print_measures(int32_t path[]){
+/*void print_measures(int32_t path[]){
 
 	chprintf((BaseSequentialStream *) &SD3, "Capteur front left: %d \r\n", path[FRONT_LEFT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur front right: %d \r\n", path[FRONT_RIGHT]);
@@ -627,4 +580,5 @@ void print_measures(int32_t path[]){
 	chprintf((BaseSequentialStream *) &SD3, "Capteur back left: %d \r\n", path[BACK_LEFT]);
 	chprintf((BaseSequentialStream *) &SD3, "Capteur back right: %d \r\n", path[BACK_RIGHT]);
 }
+*/
 

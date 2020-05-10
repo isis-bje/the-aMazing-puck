@@ -89,7 +89,6 @@ int main(void){
     while(1){
 
     	chThdSleepMilliseconds(20*SLEEP_TIME); //waits 1 second
-    	chprintf((BaseSequentialStream *) &SD3, "Sleep\r\n"); //to be removed
     }
 }
 
