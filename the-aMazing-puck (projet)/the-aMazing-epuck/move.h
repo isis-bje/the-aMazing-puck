@@ -8,7 +8,7 @@
 #define SEMIAUTO                    12
 #define SLEEP_TIME				 	50 //[ms]
 
-//---------------------------External declarations---------------------------
+//---------------------------External Declarations---------------------------
 
 void move_start(uint8_t mode);
 

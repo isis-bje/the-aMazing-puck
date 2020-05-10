@@ -21,7 +21,7 @@ enum order{STOP = 1,
 		   HALF_TURN,
 		   RETRY};
 
-//---------------------------External declarations---------------------------
+//---------------------------External Declarations---------------------------
 
 uint8_t wait_receive_order(uint8_t node_type);
 void processSound(int16_t *data, uint16_t num_samples);

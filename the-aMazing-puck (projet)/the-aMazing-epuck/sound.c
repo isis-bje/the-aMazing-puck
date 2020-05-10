@@ -55,14 +55,14 @@ static float micBack_output[FFT_SIZE];
 
 static uint8_t command;
 
-//---------------------------Internal declarations---------------------------
+//---------------------------Internal Declarations---------------------------
 
 void doFFT_optimized(uint16_t size, float* complex_buffer);
 void sound_remote(float* data);
 
-//-----------------------------External functions-----------------------------
+//-----------------------------External Functions-----------------------------
 
-/* Purpose : Asks the re-issue a sound order until it is possible to execute it.
+/* Purpose : Asks to re-issue a sound order until it is possible to execute it.
  *
  * Parameters :
  *
@@ -144,7 +144,7 @@ void processSound(int16_t *data, uint16_t num_samples){
 	}
 }
 
-//-----------------------------Internal functions-----------------------------
+//-----------------------------Internal Functions-----------------------------
 
 /* Purpose : Detect the highest value in a buffer and attribute a movement command depending on it
  *
